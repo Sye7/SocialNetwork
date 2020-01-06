@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">SocialNetwork</string>
+
+
+    <plurals name="likes_count">
+        <item quantity="one">%d like</item>
+        <item quantity="other">%d likes</item>
+    </plurals>
+
 </resources>
