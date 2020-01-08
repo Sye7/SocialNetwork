@@ -16,10 +16,10 @@ import android.view.View;
 import android.view.animation.OvershootInterpolator;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.socialnetwork.adapter.FeedAdapter;
 
-import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFeedItemClickListener,
@@ -157,6 +157,19 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
     public void onMoreClick(View v, int itemPosition) {
 
         FeedContextMenuManager.getInstance().toggleContextMenuFromView(v, itemPosition, this);
+    }
+
+    // circular anim for profile clicking
+
+    @Override
+    public void onProfileClick(View v) {
+
+        int[] startingLocation = new int[2];
+        v.getLocationOnScreen(startingLocation);
+        startingLocation[0] += v.getWidth() / 2;
+        UserProfileActivity.startUserProfileFromLocation(startingLocation, this);
+        overridePendingTransition(0, 0);
+
     }
 
 

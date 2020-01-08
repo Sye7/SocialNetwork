@@ -19,4 +19,6 @@
 
     <color name="text_like_counter">#2b5a83</color>
 
+    <color name="btn_send_pressed">#006633</color>
+
 </resources>

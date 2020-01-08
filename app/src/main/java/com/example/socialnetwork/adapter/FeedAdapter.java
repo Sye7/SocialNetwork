@@ -17,10 +17,12 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.socialnetwork.DoubleClickListener;
 import com.example.socialnetwork.R;
 import com.facebook.rebound.ui.Util;
 import com.theophrast.ui.widget.SquareImageView;
@@ -36,6 +38,8 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     // red like button
     private static final AccelerateInterpolator ACCELERATE_INTERPOLATOR = new AccelerateInterpolator();
     private static final OvershootInterpolator OVERSHOOT_INTERPOLATOR = new OvershootInterpolator(4);
+
+    private static final DecelerateInterpolator  DECCELERATE_INTERPOLATOR = new DecelerateInterpolator();
     private final Map<RecyclerView.ViewHolder, AnimatorSet> likeAnimations = new HashMap<>();
     private final ArrayList<Integer> likedPositions = new ArrayList<>();
 
@@ -56,7 +60,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        final View view = LayoutInflater.from(context).inflate(R.layout.item_feed,parent,false);
+        final View view = LayoutInflater.from(context).inflate(R.layout.item_feed, parent,false);
         return new CellFeedViewHolder(view);
     }
 
@@ -69,15 +73,15 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 likeAnimations.put(holder, animatorSet);
 
                 ObjectAnimator rotationAnim = ObjectAnimator.ofFloat(holder.btnLike, "rotation", 0f, 360f);
-                rotationAnim.setDuration(300);
+                rotationAnim.setDuration(500);
                 rotationAnim.setInterpolator(ACCELERATE_INTERPOLATOR);
 
                 ObjectAnimator bounceAnimX = ObjectAnimator.ofFloat(holder.btnLike, "scaleX", 0.2f, 1f);
-                bounceAnimX.setDuration(300);
+                bounceAnimX.setDuration(600);
                 bounceAnimX.setInterpolator(OVERSHOOT_INTERPOLATOR);
 
                 ObjectAnimator bounceAnimY = ObjectAnimator.ofFloat(holder.btnLike, "scaleY", 0.2f, 1f);
-                bounceAnimY.setDuration(300);
+                bounceAnimY.setDuration(600);
                 bounceAnimY.setInterpolator(OVERSHOOT_INTERPOLATOR);
                 bounceAnimY.addListener(new AnimatorListenerAdapter() {
                     @Override
@@ -112,6 +116,60 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
 
+// center grey like by double click
+
+    private void animatePhotoLike(final CellFeedViewHolder holder) {
+        if (!likeAnimations.containsKey(holder)) {
+            holder.vBgLike.setVisibility(View.VISIBLE);
+            holder.ivLike.setVisibility(View.VISIBLE);
+
+
+            holder.vBgLike.setScaleY(0.1f);
+            holder.vBgLike.setScaleX(0.1f);
+            holder.vBgLike.setAlpha(1f);
+            holder.ivLike.setScaleY(0.1f);
+            holder.ivLike.setScaleX(0.1f);
+
+            AnimatorSet animatorSet = new AnimatorSet();
+            likeAnimations.put(holder, animatorSet);
+
+            ObjectAnimator bgScaleYAnim = ObjectAnimator.ofFloat(holder.vBgLike, "scaleY", 0.1f, 1f);
+            bgScaleYAnim.setDuration(400);
+            bgScaleYAnim.setInterpolator(DECCELERATE_INTERPOLATOR);
+            ObjectAnimator bgScaleXAnim = ObjectAnimator.ofFloat(holder.vBgLike, "scaleX", 0.1f, 1f);
+            bgScaleXAnim.setDuration(400);
+            bgScaleXAnim.setInterpolator(DECCELERATE_INTERPOLATOR);
+            ObjectAnimator bgAlphaAnim = ObjectAnimator.ofFloat(holder.vBgLike, "alpha", 1f, 0f);
+            bgAlphaAnim.setDuration(400);
+            bgAlphaAnim.setStartDelay(400);
+            bgAlphaAnim.setInterpolator(DECCELERATE_INTERPOLATOR);
+
+            ObjectAnimator imgScaleUpYAnim = ObjectAnimator.ofFloat(holder.ivLike, "scaleY", 0.1f, 1f);
+            imgScaleUpYAnim.setDuration(400);
+            imgScaleUpYAnim.setInterpolator(DECCELERATE_INTERPOLATOR);
+            ObjectAnimator imgScaleUpXAnim = ObjectAnimator.ofFloat(holder.ivLike, "scaleX", 0.1f, 1f);
+            imgScaleUpXAnim.setDuration(400);
+            imgScaleUpXAnim.setInterpolator(DECCELERATE_INTERPOLATOR);
+
+            ObjectAnimator imgScaleDownYAnim = ObjectAnimator.ofFloat(holder.ivLike, "scaleY", 1f, 0f);
+            imgScaleDownYAnim.setDuration(400);
+            imgScaleDownYAnim.setInterpolator(ACCELERATE_INTERPOLATOR);
+            ObjectAnimator imgScaleDownXAnim = ObjectAnimator.ofFloat(holder.ivLike, "scaleX", 1f, 0f);
+            imgScaleDownXAnim.setDuration(400);
+            imgScaleDownXAnim.setInterpolator(ACCELERATE_INTERPOLATOR);
+
+            animatorSet.playTogether(bgScaleYAnim, bgScaleXAnim, bgAlphaAnim, imgScaleUpYAnim, imgScaleUpXAnim);
+            animatorSet.play(imgScaleDownYAnim).with(imgScaleDownXAnim).after(imgScaleUpYAnim);
+
+            animatorSet.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    resetLikeAnimationState(holder);
+                }
+            });
+            animatorSet.start();
+        }
+    }
 
 
 
@@ -169,6 +227,40 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         // red like button anim
         updateHeartButton(holder, false);
+
+        holder.ivUserProfile.setTag(holder);
+        holder.ivUserProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (onFeedItemClickListener != null) {
+                    onFeedItemClickListener.onProfileClick(v);
+                }
+            }
+        });
+
+
+        holder.ivFeedCenter.setTag(holder);
+        holder.ivFeedCenter.setOnClickListener(new DoubleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
+
+            }
+
+            @Override
+            public void onDoubleClick(View v) {
+
+                CellFeedViewHolder holder = (CellFeedViewHolder) v.getTag();
+                // center like btn grey
+                animatePhotoLike(holder);
+                updateLikesCounter(holder, true);
+                holder.btnLike.setImageResource(R.drawable.ic_heart_red);
+
+
+            }
+        });
+
+
         holder.btnLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -181,6 +273,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 }
             }
         });
+
         holder.btnLike.setTag(holder);
 
         if (likeAnimations.containsKey(holder)) {
@@ -243,6 +336,8 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public void onCommentsClick(View v, int position);
 
         public void onMoreClick(View v, int position);
+
+        public void onProfileClick(View v);
     }
 
 
@@ -269,6 +364,8 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         ImageView ivLike;
         TextSwitcher tsLikesCounter;
 
+        ImageView ivUserProfile;
+
 
         public CellFeedViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -282,6 +379,9 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             vBgLike = itemView.findViewById(R.id.vBgLike);
             tsLikesCounter = itemView.findViewById(R.id.tsLikesCounter);
             ivLike = itemView.findViewById(R.id.ivLike);
+
+            // must be changed id
+            ivUserProfile = itemView.findViewById(R.id.profileHeart);
 
         }
     }

@@ -7,4 +7,55 @@
         <item quantity="other">%d likes</item>
     </plurals>
 
+    <string name="user_profile_photo">https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQ8Xo6ESTh7bqE0KtT3AyZ75Cn1DDXd1RYvmiSO1wp4biSErymp</string>
+
+
+    <string-array name="user_photos">
+        <item>https://instagram.ffra1-1.fna.fbcdn.net/v/t51.2885-15/e35/80845297_173380677240237_1242945651216511616_n.jpg?_nc_ht=instagram.ffra1-1.fna.fbcdn.net&amp;_nc_cat=109&amp;_nc_ohc=az2D9M1Wgh8AX-Dzmka&amp;se=7&amp;oh=e82317c83c0b4dd588d03b26162e64ed&amp;oe=5EB1B770&amp;ig_cache_key=MjIxNjg4MDExNzQ5ODI4NzA2Mw%3D%3D.2</item>
+
+        <item>https://instagram.ffra1-1.fna.fbcdn.net/v/t51.2885-15/e35/69716082_442666156596189_1162157692252697029_n.jpg?_nc_ht=instagram.ffra1-1.fna.fbcdn.net&amp;_nc_cat=109&amp;_nc_ohc=cV_JxTF-yXcAX9GGEuS&amp;se=7&amp;oh=d9a2666684a76ac223ae04305c947f3e&amp;oe=5EA2CEC9&amp;ig_cache_key=MjEzODE1MjEyNzQ2MjAxOTc1Ng%3D%3D.2</item>
+
+        <item>https://instagram.ffra1-1.fna.fbcdn.net/v/t51.2885-15/e35/80845297_173380677240237_1242945651216511616_n.jpg?_nc_ht=instagram.ffra1-1.fna.fbcdn.net&amp;_nc_cat=109&amp;_nc_ohc=az2D9M1Wgh8AX-Dzmka&amp;se=7&amp;oh=e82317c83c0b4dd588d03b26162e64ed&amp;oe=5EB1B770&amp;ig_cache_key=MjEyNDI2MjE4ODcwNTkwODI0Mw%3D%3D.2</item>
+
+        <item>https://instagram.fblr5-1.fna.fbcdn.net/v/t51.2885-15/sh0.08/e35/s640x640/67439500_886381161737474_8628880532460060231_n.jpg?_nc_ht=instagram.fblr5-1.fna.fbcdn.net&amp;_nc_cat=102&amp;_nc_ohc=RV7nQbJdCskAX9CEWdF&amp;oh=be7ad77a192ea17c7790c70167238848&amp;oe=5E9143A1</item>
+
+
+        <item>https://instagram.ffra1-1.fna.fbcdn.net/v/t51.2885-15/e35/69716082_442666156596189_1162157692252697029_n.jpg?_nc_ht=instagram.ffra1-1.fna.fbcdn.net&amp;_nc_cat=109&amp;_nc_ohc=cV_JxTF-yXcAX9GGEuS&amp;se=7&amp;oh=d9a2666684a76ac223ae04305c947f3e&amp;oe=5EA2CEC9&amp;ig_cache_key=MjExMDg5NjQ1NTY5OTY4OTc2OQ%3D%3D.2</item>
+
+        <item>https://instagram.ffra1-1.fna.fbcdn.net/v/t51.2885-15/e35/80845297_173380677240237_1242945651216511616_n.jpg?_nc_ht=instagram.ffra1-1.fna.fbcdn.net&amp;_nc_cat=109&amp;_nc_ohc=az2D9M1Wgh8AX-Dzmka&amp;se=7&amp;oh=e82317c83c0b4dd588d03b26162e64ed&amp;oe=5EB1B770&amp;</item>
+
+        <item>https://instagram.ffra1-1.fna.fbcdn.net/v/t51.2885-15/e35/80845297_173380677240237_1242945651216511616_n.jpg?_nc_ht=instagram.ffra1-1.fna.fbcdn.net&amp;_nc_cat=109&amp;_nc_ohc=az2D9M1Wgh8AX-Dzmka&amp;se=7&amp;oh=e82317c83c0b4dd588d03b26162e64ed&amp;oe=5EB1B770&amp;</item>
+
+        <item>https://instagram.ffra1-1.fna.fbcdn.net/v/t51.2885-15/e35/80845297_173380677240237_1242945651216511616_n.jpg?_nc_ht=instagram.ffra1-1.fna.fbcdn.net&amp;_nc_cat=109&amp;_nc_ohc=az2D9M1Wgh8AX-Dzmka&amp;se=7&amp;oh=e82317c83c0b4dd588d03b26162e64ed&amp;oe=5EB1B770&amp;</item>
+
+        <item>https://instagram.ffra1-1.fna.fbcdn.net/v/t51.2885-15/e35/80845297_173380677240237_1242945651216511616_n.jpg?_nc_ht=instagram.ffra1-1.fna.fbcdn.net&amp;_nc_cat=109&amp;_nc_ohc=az2D9M1Wgh8AX-Dzmka&amp;se=7&amp;oh=e82317c83c0b4dd588d03b26162e64ed&amp;oe=5EB1B770&amp;ig_cache_key=MjEyODQ1MzE3NDYzMzk4NzAxNg%3D%3D.2</item>
+
+        <item>https://instagram.ffra1-1.fna.fbcdn.net/v/t51.2885-15/e35/69716082_442666156596189_1162157692252697029_n.jpg?_nc_ht=instagram.ffra1-1.fna.fbcdn.net&amp;_nc_cat=109&amp;_nc_ohc=cV_JxTF-yXcAX9GGEuS&amp;se=7&amp;oh=d9a2666684a76ac223ae04305c947f3e&amp;oe=5EA2CEC9&amp;</item>
+
+        <item>https://instagram.ffra1-1.fna.fbcdn.net/v/t51.2885-15/e35/80845297_173380677240237_1242945651216511616_n.jpg?_nc_ht=instagram.ffra1-1.fna.fbcdn.net&amp;_nc_cat=109&amp;_nc_ohc=az2D9M1Wgh8AX-Dzmka&amp;se=7&amp;oh=e82317c83c0b4dd588d03b26162e64ed&amp;oe=5EB1B770&amp;</item>
+
+        <item>https://instagram.ffra1-1.fna.fbcdn.net/v/t51.2885-15/e35/80845297_173380677240237_1242945651216511616_n.jpg?_nc_ht=instagram.ffra1-1.fna.fbcdn.net&amp;_nc_cat=109&amp;_nc_ohc=az2D9M1Wgh8AX-Dzmka&amp;se=7&amp;oh=e82317c83c0b4dd588d03b26162e64ed&amp;oe=5EB1B770&amp;</item>
+
+        <item>https://instagram.ffra1-1.fna.fbcdn.net/v/t51.2885-15/e35/80845297_173380677240237_1242945651216511616_n.jpg?_nc_ht=instagram.ffra1-1.fna.fbcdn.net&amp;_nc_cat=109&amp;_nc_ohc=az2D9M1Wgh8AX-Dzmka&amp;se=7&amp;oh=e82317c83c0b4dd588d03b26162e64ed&amp;oe=5EB1B770&amp;</item>
+
+        <item>https://instagram.ffra1-1.fna.fbcdn.net/v/t51.2885-15/e35/80845297_173380677240237_1242945651216511616_n.jpg?_nc_ht=instagram.ffra1-1.fna.fbcdn.net&amp;_nc_cat=109&amp;_nc_ohc=az2D9M1Wgh8AX-Dzmka&amp;se=7&amp;oh=e82317c83c0b4dd588d03b26162e64ed&amp;oe=5EB1B770&amp;</item>
+
+        <item>https://instagram.ffra1-1.fna.fbcdn.net/v/t51.2885-15/e35/80845297_173380677240237_1242945651216511616_n.jpg?_nc_ht=instagram.ffra1-1.fna.fbcdn.net&amp;_nc_cat=109&amp;_nc_ohc=az2D9M1Wgh8AX-Dzmka&amp;se=7&amp;oh=e82317c83c0b4dd588d03b26162e64ed&amp;oe=5EB1B770&amp;</item>
+
+        <item>https://instagram.ffra1-1.fna.fbcdn.net/v/t51.2885-15/e35/80845297_173380677240237_1242945651216511616_n.jpg?_nc_ht=instagram.ffra1-1.fna.fbcdn.net&amp;_nc_cat=109&amp;_nc_ohc=az2D9M1Wgh8AX-Dzmka&amp;se=7&amp;oh=e82317c83c0b4dd588d03b26162e64ed&amp;oe=5EB1B770&amp;</item>
+
+        <item>https://instagram.ffra1-1.fna.fbcdn.net/v/t51.2885-15/e35/80845297_173380677240237_1242945651216511616_n.jpg?_nc_ht=instagram.ffra1-1.fna.fbcdn.net&amp;_nc_cat=109&amp;_nc_ohc=az2D9M1Wgh8AX-Dzmka&amp;se=7&amp;oh=e82317c83c0b4dd588d03b26162e64ed&amp;oe=5EB1B770&amp;</item>
+
+        <item>https://instagram.ffra1-1.fna.fbcdn.net/v/t51.2885-15/e35/80845297_173380677240237_1242945651216511616_n.jpg?_nc_ht=instagram.ffra1-1.fna.fbcdn.net&amp;_nc_cat=109&amp;_nc_ohc=az2D9M1Wgh8AX-Dzmka&amp;se=7&amp;oh=e82317c83c0b4dd588d03b26162e64ed&amp;oe=5EB1B770&amp;</item>
+
+        <item>https://instagram.ffra1-1.fna.fbcdn.net/v/t51.2885-15/e35/69716082_442666156596189_1162157692252697029_n.jpg?_nc_ht=instagram.ffra1-1.fna.fbcdn.net&amp;_nc_cat=109&amp;_nc_ohc=cV_JxTF-yXcAX9GGEuS&amp;se=7&amp;oh=d9a2666684a76ac223ae04305c947f3e&amp;oe=5EA2CEC9&amp;</item>
+
+        <item>https://instagram.ffra1-1.fna.fbcdn.net/v/t51.2885-15/e35/80845297_173380677240237_1242945651216511616_n.jpg?_nc_ht=instagram.ffra1-1.fna.fbcdn.net&amp;_nc_cat=109&amp;_nc_ohc=az2D9M1Wgh8AX-Dzmka&amp;se=7&amp;oh=e82317c83c0b4dd588d03b26162e64ed&amp;oe=5EB1B770&amp;jE4ODcwNTkwODI0Mw%3D%3D.2</item>
+
+        <item>https://instagram.ffra1-1.fna.fbcdn.net/v/t51.2885-15/e35/69716082_442666156596189_1162157692252697029_n.jpg?_nc_ht=instagram.ffra1-1.fna.fbcdn.net&amp;_nc_cat=109&amp;_nc_ohc=cV_JxTF-yXcAX9GGEuS&amp;se=7&amp;oh=d9a2666684a76ac223ae04305c947f3e&amp;oe=5EA2CEC9&amp;ig_cache_key=MjExMDg5jQ1NTY5OTY4OTc2OQ%3D%3D.2</item>
+
+
+
+    </string-array>
+
 </resources>
