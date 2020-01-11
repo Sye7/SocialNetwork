@@ -199,4 +199,9 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
 
 
     }
+
+    public void openCamera(View view) {
+        Intent intent = new Intent(getApplicationContext(), CameraXImpl.class);
+        startActivity(intent);
+    }
 }

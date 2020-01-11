@@ -25,6 +25,7 @@
         android:layout_alignParentEnd="true"
         android:layout_marginBottom="@dimen/btn_fab_margins"
         android:layout_marginEnd="@dimen/btn_fab_margins"
+        android:onClick="openCamera"
 
         android:background="@drawable/btn_fab_default"
         android:elevation="@dimen/default_elevation"
