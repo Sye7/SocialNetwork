@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/activityMain"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimaryReallyDark">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/colorPrimaryReallyDark"
+    tools:context=".CameraXImpl">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,7 +19,7 @@
             <com.camerakit.CameraKitView
                 android:id="@+id/camera"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:adjustViewBounds="true"
                 app:camera_facing="back"
                 app:camera_focus="continuous"
@@ -34,14 +35,6 @@
                 android:text="Approve Permissions"
                 android:visibility="gone" />
 
-            <jpegkit.JpegImageView
-                android:id="@+id/imageView"
-                android:layout_width="108dp"
-                android:layout_height="192dp"
-                android:layout_gravity="top|center_horizontal"
-                android:layout_margin="16dp"
-                android:alpha="1.0"
-                android:scaleType="centerInside" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -117,6 +110,7 @@
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/facingFrontButton"
+                android:onClick="frontCamera"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/colorPrimaryDark"
@@ -126,6 +120,7 @@
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/facingBackButton"
+                android:onClick="backCamera"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/colorPrimaryDark"
@@ -135,13 +130,21 @@
 
         </LinearLayout>
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
+
+
+        <ImageButton
             android:id="@+id/photoButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:onClick="onPhotoClick"
+            android:layout_width="@dimen/btn_fab_size"
+            android:layout_height="@dimen/btn_fab_size"
             android:layout_gravity="center_horizontal|bottom"
+            android:layout_marginEnd="@dimen/btn_fab_margins"
             android:layout_marginBottom="12dp"
-            android:src="@drawable/ic_photo" />
+            android:background="@drawable/btn_fab_default"
+            android:elevation="@dimen/default_elevation"
+            android:layout_marginStart="20dp"
+            android:src="@drawable/ic_photo"
+            android:textSize = "28sp"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -151,6 +154,7 @@
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/flashOnButton"
+                android:onClick="flashOn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/colorPrimaryDark"
@@ -161,6 +165,7 @@
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/flashOffButton"
                 android:layout_width="wrap_content"
+                android:onClick="flashOff"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/colorPrimaryDark"
                 android:drawableLeft="@drawable/ic_flash_off"

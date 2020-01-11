@@ -5,6 +5,7 @@ import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,9 +14,6 @@ import androidx.appcompat.widget.AppCompatTextView;
 import com.camerakit.CameraKit;
 import com.camerakit.CameraKitView;
 import com.camerakit.type.CameraSize;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.jpegkit.Jpeg;
-import com.jpegkit.JpegImageView;
 
 
 public class CameraXImpl extends AppCompatActivity {
@@ -31,21 +29,37 @@ public class CameraXImpl extends AppCompatActivity {
     private Button flashOnButton;
     private Button flashOffButton;
 
-    private FloatingActionButton photoButton;
+    private ImageButton photoButton;
 
     private Button facingFrontButton;
     private Button facingBackButton;
 
     private Button permissionsButton;
 
-    private JpegImageView imageView;
+
+    public void onPhotoClick(View view)
+    {
+        cameraView.captureImage(new CameraKitView.ImageCallback() {
+            @Override
+            public void onImage(CameraKitView view, final byte[] photo) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        // Store in external drive
+                    }
+                }).start();
+            }
+        });
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_camera_x);
 
         cameraView = findViewById(R.id.camera);
+
 
 
 
@@ -55,19 +69,15 @@ public class CameraXImpl extends AppCompatActivity {
         photoSizeText = findViewById(R.id.photoSizeText);
 
         photoButton = findViewById(R.id.photoButton);
-        photoButton.setOnClickListener(photoOnClickListener);
+      //  photoButton.setOnClickListener(photoOnClickListener);
 
         flashOnButton = findViewById(R.id.flashOnButton);
         flashOffButton = findViewById(R.id.flashOffButton);
 
-        flashOnButton.setOnClickListener(flashOnOnClickListener);
-        flashOffButton.setOnClickListener(flashOffOnClickListener);
 
         facingFrontButton = findViewById(R.id.facingFrontButton);
         facingBackButton = findViewById(R.id.facingBackButton);
 
-        facingFrontButton.setOnClickListener(facingFrontOnClickListener);
-        facingBackButton.setOnClickListener(facingBackOnClickListener);
 
         permissionsButton = findViewById(R.id.permissionsButton);
         permissionsButton.setOnClickListener(new View.OnClickListener() {
@@ -77,7 +87,6 @@ public class CameraXImpl extends AppCompatActivity {
             }
         });
 
-        imageView = findViewById(R.id.imageView);
 
         cameraView.setPermissionsListener(new CameraKitView.PermissionsListener() {
             @Override
@@ -152,59 +161,38 @@ public class CameraXImpl extends AppCompatActivity {
     private View.OnClickListener photoOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            cameraView.captureImage(new CameraKitView.ImageCallback() {
-                @Override
-                public void onImage(CameraKitView view, final byte[] photo) {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            final Jpeg jpeg = new Jpeg(photo);
-                            imageView.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    imageView.setJpeg(jpeg);
-                                }
-                            });
-                        }
-                    }).start();
-                }
-            });
+
         }
     };
 
-    private View.OnClickListener flashOnOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if (cameraView.getFlash() != CameraKit.FLASH_ON) {
-                cameraView.setFlash(CameraKit.FLASH_ON);
-                updateInfoText();
-            }
+    public void flashOn(View v)
+    {
+        if (cameraView.getFlash() != CameraKit.FLASH_ON) {
+            cameraView.setFlash(CameraKit.FLASH_ON);
+            updateInfoText();
         }
-    };
+    }
 
-    private View.OnClickListener flashOffOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if (cameraView.getFlash() != CameraKit.FLASH_OFF) {
-                cameraView.setFlash(CameraKit.FLASH_OFF);
-                updateInfoText();
-            }
-        }
-    };
 
-    private View.OnClickListener facingFrontOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            cameraView.setFacing(CameraKit.FACING_FRONT);
+    public void flashOff(View v)
+    {
+        if (cameraView.getFlash() != CameraKit.FLASH_OFF) {
+            cameraView.setFlash(CameraKit.FLASH_OFF);
+            updateInfoText();
         }
-    };
+    }
 
-    private View.OnClickListener facingBackOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            cameraView.setFacing(CameraKit.FACING_BACK);
-        }
-    };
+    public void frontCamera(View v)
+    {
+        cameraView.setFacing(CameraKit.FACING_FRONT);
+    }
+
+    public void backCamera(View v)
+    {
+        cameraView.setFacing(CameraKit.FACING_BACK);
+    }
+
+
 
     private void updateInfoText() {
         String facingValue = cameraView.getFacing() == CameraKit.FACING_BACK ? "BACK" : "FRONT";
