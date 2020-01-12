@@ -3,12 +3,10 @@ package com.example.socialnetwork.adapter;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
-import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
-import android.view.animation.Transformation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -67,13 +65,15 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         if (position > lastAnimatedPosition) {
             lastAnimatedPosition = position;
-            view.setTranslationY(100);
+            // 100
+            view.setTranslationY(200);
             view.setAlpha(0.f);
             view.animate()
                     .translationY(0).alpha(1.f)
                     .setStartDelay(delayEnterAnimation ? 20 * (position) : 0)
                     .setInterpolator(new DecelerateInterpolator(2.f))
-                    .setDuration(300)
+                    .setDuration(200)
+                    // 200
                     .setListener(new AnimatorListenerAdapter() {
                         @Override
                         public void onAnimationEnd(Animator animation) {

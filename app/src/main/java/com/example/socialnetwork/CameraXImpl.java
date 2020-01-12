@@ -1,9 +1,12 @@
 package com.example.socialnetwork;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
 import android.widget.ImageButton;
 
@@ -26,16 +29,26 @@ public class CameraXImpl extends AppCompatActivity {
     private AppCompatTextView previewSizeText;
     private AppCompatTextView photoSizeText;
 
-    private Button flashOnButton;
-    private Button flashOffButton;
+    private ImageButton flashOnButton;
+    private ImageButton flashOffButton;
+    ImageButton photoButton;
 
-    private ImageButton photoButton;
 
-    private Button facingFrontButton;
-    private Button facingBackButton;
+    private ImageButton facingFrontButton;
+    private ImageButton facingBackButton;
+
+    private ImageButton videoRecord;
 
     private Button permissionsButton;
+    static  byte[] pic=null;
+    public static final String ARG_REVEAL_START_LOCATION = "reveal_start_location";
 
+
+    public static void startUserProfileFromLocation(int[] startingLocation, Activity startingActivity) {
+        Intent intent = new Intent(startingActivity, CameraXImpl.class);
+        intent.putExtra(ARG_REVEAL_START_LOCATION, startingLocation);
+        startingActivity.startActivity(intent);
+    }
 
     public void onPhotoClick(View view)
     {
@@ -47,10 +60,35 @@ public class CameraXImpl extends AppCompatActivity {
                     public void run() {
 
                         // Store in external drive
+                        Intent intent = new Intent(getApplicationContext(), PublishActivity.class);
+                        pic = photo;
+
+                            startActivity(intent);
+
                     }
                 }).start();
             }
         });
+    }
+
+    boolean videoFlag=true;
+
+    public void videoRecording(View v){
+
+
+        if(videoFlag)
+        {
+            videoRecord.setImageResource(R.drawable.stop_video);
+            videoFlag  = false;
+
+        }
+        else
+        {
+            videoRecord.setImageResource(R.drawable.ic_video);
+            videoFlag  = true;
+        }
+
+
     }
 
     @Override
@@ -59,8 +97,6 @@ public class CameraXImpl extends AppCompatActivity {
         setContentView(R.layout.activity_camera_x);
 
         cameraView = findViewById(R.id.camera);
-
-
 
 
         facingText = findViewById(R.id.facingText);
@@ -73,10 +109,11 @@ public class CameraXImpl extends AppCompatActivity {
 
         flashOnButton = findViewById(R.id.flashOnButton);
         flashOffButton = findViewById(R.id.flashOffButton);
-
+        videoRecord = findViewById(R.id.ib_video);
 
         facingFrontButton = findViewById(R.id.facingFrontButton);
         facingBackButton = findViewById(R.id.facingBackButton);
+
 
 
         permissionsButton = findViewById(R.id.permissionsButton);
@@ -87,6 +124,24 @@ public class CameraXImpl extends AppCompatActivity {
             }
         });
 
+        // circular anim
+
+
+
+
+
+        flashOnButton.setTranslationY(2 * getResources().getDimensionPixelOffset(R.dimen.btn_fab_size));
+        flashOffButton.setTranslationY(2 * getResources().getDimensionPixelOffset(R.dimen.btn_fab_size));
+        facingFrontButton.setTranslationY(2 * getResources().getDimensionPixelOffset(R.dimen.btn_fab_size));
+        facingBackButton.setTranslationY(2 * getResources().getDimensionPixelOffset(R.dimen.btn_fab_size));
+        photoButton.setTranslationY(2 * getResources().getDimensionPixelOffset(R.dimen.btn_fab_size));
+
+
+        startContentAnimation1();
+        startContentAnimation2();
+        startContentAnimation3();
+        startContentAnimation4();
+        startContentAnimation5();
 
         cameraView.setPermissionsListener(new CameraKitView.PermissionsListener() {
             @Override
@@ -124,6 +179,57 @@ public class CameraXImpl extends AppCompatActivity {
                 Log.v("CameraKitView", "PreviewListener: onStop()");
             }
         });
+
+
+
+    }
+
+
+    private static final int ANIM_DURATION_FAB = 400;
+
+    private void startContentAnimation1() {
+        flashOffButton.animate()
+                .translationY(1)
+                .setInterpolator(new OvershootInterpolator(1.f))
+                .setStartDelay(1000)
+                .setDuration(ANIM_DURATION_FAB)
+                .start();
+    }
+
+    private void startContentAnimation2() {
+        flashOnButton.animate()
+                .translationY(0)
+                .setInterpolator(new OvershootInterpolator(1.f))
+                .setStartDelay(1000)
+                .setDuration(ANIM_DURATION_FAB)
+                .start();
+    }
+
+    private void startContentAnimation3() {
+        photoButton.animate()
+                .translationY(0)
+                .setInterpolator(new OvershootInterpolator(1.f))
+                .setStartDelay(1000)
+                .setDuration(ANIM_DURATION_FAB)
+                .start();
+    }
+
+    private void startContentAnimation4() {
+        facingBackButton.animate()
+                .translationY(0)
+                .setInterpolator(new OvershootInterpolator(1.f))
+                .setStartDelay(1000)
+                .setDuration(ANIM_DURATION_FAB)
+                .start();
+    }
+
+    private void startContentAnimation5() {
+        facingFrontButton.animate()
+                .translationY(0)
+                .setInterpolator(new OvershootInterpolator(1.f))
+                .setStartDelay(1000)
+                .setDuration(ANIM_DURATION_FAB)
+                .start();
     }
 
     @Override

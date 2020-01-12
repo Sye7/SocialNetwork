@@ -20,10 +20,6 @@ import com.example.socialnetwork.adapter.UserProfileAdapter;
 import com.example.socialnetwork.view.RevealBackgroundView;
 import com.squareup.picasso.Picasso;
 
-import butterknife.BindDrawable;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 
 public class UserProfileActivity extends AppCompatActivity implements RevealBackgroundView.OnStateChangeListener {
     public static final String ARG_REVEAL_START_LOCATION = "reveal_start_location";
@@ -131,7 +127,6 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
             vUserProfileRoot.setVisibility(View.VISIBLE);
             userPhotosAdapter = new UserProfileAdapter(this);
             rvUserProfile.setAdapter(userPhotosAdapter);
-            animateUserProfileOptions();
             animateUserProfileHeader();
         } else {
           //  tlUserProfileTabs.setVisibility(View.INVISIBLE);
@@ -140,11 +135,7 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
         }
     }
 
-    // Tab layout
-    private void animateUserProfileOptions() {
-      //  tlUserProfileTabs.setTranslationY(-tlUserProfileTabs.getHeight());
-       // tlUserProfileTabs.animate().translationY(0).setDuration(300).setStartDelay(USER_OPTIONS_ANIMATION_DELAY).setInterpolator(INTERPOLATOR);
-    }
+
 
     private void animateUserProfileHeader() {
         vUserProfileRoot.setTranslationY(-vUserProfileRoot.getHeight());

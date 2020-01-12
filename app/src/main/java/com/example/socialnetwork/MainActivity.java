@@ -1,22 +1,17 @@
 package com.example.socialnetwork;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.socialnetwork.adapter.FeedAdapter;
 
@@ -145,11 +140,6 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
         //Disable enter transition for new Acitvity
         overridePendingTransition(0, 0);
 
-        /*
-        By calling overridePendingTransition(0, 0);
-        we disable exit animation (for MainActivity) and enter animation (for CommentsActivity).
-
-         */
 
     }
 
@@ -200,8 +190,14 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
 
     }
 
-    public void openCamera(View view) {
-        Intent intent = new Intent(getApplicationContext(), CameraXImpl.class);
-        startActivity(intent);
+    public void openCamera(View v) {
+
+        int[] startingLocation = new int[2];
+        v.getLocationOnScreen(startingLocation);
+        startingLocation[0] += v.getWidth() / 2;
+        CameraXImpl.startUserProfileFromLocation(startingLocation, this);
+      //  overridePendingTransition(0, 0);
+
+
     }
 }
