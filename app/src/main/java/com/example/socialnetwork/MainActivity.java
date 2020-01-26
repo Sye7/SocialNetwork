@@ -18,7 +18,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 
 public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFeedItemClickListener,
-        FeedContextMenu.OnFeedContextMenuItemClickListener   {
+        FeedContextMenu.OnFeedContextMenuItemClickListener {
 
     private FeedAdapter feedAdapter;
     Toolbar toolbar;
@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
 
         //Increase the amount of extra space that should be laid out by LayoutManager.
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this){
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this) {
             @Override
             protected int getExtraLayoutSpace(RecyclerView.State state) {
                 return 300;
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
 
 //Animation
 
-    public  int dpToPx(int dp) {
+    public int dpToPx(int dp) {
         DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
         return Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
     }
@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
         toolbar.setTranslationY(-actionbarSize);
         ivLogo.setTranslationY(-actionbarSize);
         inboxMenuItem.setTranslationY(-actionbarSize);
-   //     inboxMenuItem.getActionView().setTranslationY(-actionbarSize);
+        //     inboxMenuItem.getActionView().setTranslationY(-actionbarSize);
 
         toolbar.animate()
                 .translationY(0)
@@ -108,11 +108,10 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
 
         ivLogo = findViewById(R.id.ivLogo);
         btnCreate = findViewById(R.id.btnCreate);
-        inboxMenuItem =  findViewById(R.id.msz);
+        inboxMenuItem = findViewById(R.id.msz);
 
         setupFeed();
         startIntroAnimation();
-
 
 
         rvFeed.setOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -186,9 +185,7 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
 
     @Override
     public void onCancelClick(int feedItem) {
-
         FeedContextMenuManager.getInstance().hideContextMenu();
-
 
     }
 
@@ -201,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
         v.getLocationOnScreen(startingLocation);
         startingLocation[0] += v.getWidth() / 2;
         CameraXImpl.startUserProfileFromLocation(startingLocation, this);
-      //  overridePendingTransition(0, 0);
+        //  overridePendingTransition(0, 0);
 
 
     }

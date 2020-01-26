@@ -10,14 +10,25 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.example.socialnetwork.CircularImage.CircleTransformation;
 import com.example.socialnetwork.adapter.UserProfileAdapter;
+import com.example.socialnetwork.model.User;
 import com.example.socialnetwork.view.RevealBackgroundView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 
@@ -38,6 +49,7 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
     Button btnFollow;
     View vUserStats;
     View vUserProfileRoot;
+    TextView tvUserName;
 
     private int avatarSize;
     private String profilePhoto;
@@ -65,6 +77,7 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
         btnFollow = findViewById(R.id.btnFollow);
         vUserStats = findViewById(R.id.vUserStats);
         vUserProfileRoot = findViewById(R.id.vUserProfileRoot);
+        tvUserName = findViewById(R.id.tvUserName);
 
         Picasso.get()
                 .load(profilePhoto)
@@ -78,6 +91,7 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
       //  setupTabs();
         setupUserProfileGrid();
         setupRevealBackground(savedInstanceState);
+        getData();
     }
 
    /* private void setupTabs() {
@@ -148,4 +162,46 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
         vUserDetails.animate().translationY(0).setDuration(300).setStartDelay(200).setInterpolator(INTERPOLATOR);
         vUserStats.animate().alpha(1).setDuration(200).setStartDelay(400).setInterpolator(INTERPOLATOR).start();
     }
+
+    public void getData() {
+
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("User");
+
+
+        Query query = reference.orderByChild("id").equalTo(firebaseUser.getUid());
+
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    User user = snapshot.getValue(User.class);
+
+
+                    if (user.getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+
+
+                        // If already present
+                        String name = user.getName();
+                       tvUserName.setText(name);
+
+
+                    }
+
+                }
+
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
 }

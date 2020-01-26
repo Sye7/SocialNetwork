@@ -73,8 +73,8 @@ public class SignUpActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(SignUpActivity.this, StartActivity.class);
-                finish();
                 startActivity(i);
+                finish();
             }
         });
 
@@ -123,13 +123,21 @@ public class SignUpActivity extends AppCompatActivity {
     String userName;
     String userEmail;
     String userPass;
+    String id;
 
     public void storeInDb() {
         userName = name.getText().toString().trim();
         userEmail = email.getText().toString();
         userPass = password.getText().toString();
+        id = mAuth.getCurrentUser().getUid();
 
-        User user = new User(userName, userEmail, userPass );
+        if(userName == null || userName.length() <3 )
+        {
+            Toast.makeText(this, "Enter valid UserName", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        User user = new User(userName, userEmail, userPass,id );
         reference.push().setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
