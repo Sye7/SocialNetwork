@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "975591720201",
+    "firebase_url": "https://connectionsmine.firebaseio.com",
+    "project_id": "connectionsmine",
+    "storage_bucket": "connectionsmine.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:975591720201:android:372bab15edf3f6def37fd8",
+        "android_client_info": {
+          "package_name": "com.example.socialnetwork"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "975591720201-644a88leefqeurkv3joq5vkkcbh6ab12.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.socialnetwork",
+            "certificate_hash": "aa0b64ba894cce53d6fb18f587f6ef3ed053039a"
+          }
+        },
+        {
+          "client_id": "975591720201-grofhim3bde759vo6mdpbd2s7qpu1div.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDyWpZRnKIueAl1Q5R4HNCA1gbYmr8IUxE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "975591720201-grofhim3bde759vo6mdpbd2s7qpu1div.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

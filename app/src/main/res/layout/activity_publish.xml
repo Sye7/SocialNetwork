@@ -19,14 +19,34 @@
                 android:elevation="@dimen/default_elevation"
                 app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
+
                 <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:fontFamily="@font/pacifico"
                     android:src="@mipmap/img_toolbar_logo"
                     android:text="SHARE TO"
                     android:textColor="#333333"
-                    android:textSize="18sp" />
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:id="@+id/btn_publish"
+                    android:onClick="publish"
+                    android:layout_gravity="end"
+                    android:drawableRight="@drawable/share_pub"
+                    android:text="Send"
+                    android:fontFamily="@font/pacifico"
+                    android:textColor="#fff"
+                    android:layout_height="wrap_content"
+                    android:background="#37474F"
+                    android:layout_marginEnd="23dp"
+
+                    />
+
+
             </androidx.appcompat.widget.Toolbar>
 
             <LinearLayout
@@ -84,6 +104,7 @@
                             android:id="@+id/ivPhoto"
                             android:layout_width="@dimen/publish_photo_thumbnail_size"
                             android:layout_height="@dimen/publish_photo_thumbnail_size"
+                            android:scaleType="centerCrop"
                             android:layout_marginRight="16dp"
                             android:background="#eeeeee" />
 

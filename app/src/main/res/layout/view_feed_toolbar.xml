@@ -10,9 +10,14 @@
     app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
 
-    <ImageView
+    <TextView
         android:id="@+id/ivLogo"
         android:layout_width="wrap_content"
+        android:text="ConnectionsMine"
+        android:gravity="center"
+        android:textColor="#fff"
+        android:fontFamily="@font/pacifico"
+        android:textSize="20sp"
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:scaleType="centerInside"

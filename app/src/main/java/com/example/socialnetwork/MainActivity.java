@@ -6,7 +6,7 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
 import android.widget.ImageButton;
-import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.socialnetwork.adapter.FeedAdapter;
-
+import com.google.firebase.auth.FirebaseAuth;
 
 
 public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFeedItemClickListener,
@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
     Toolbar toolbar;
     RecyclerView rvFeed;
 
-    ImageView ivLogo;
+    TextView ivLogo;
     ImageButton btnCreate;
 
 
@@ -113,6 +113,8 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
         setupFeed();
         startIntroAnimation();
 
+
+
         rvFeed.setOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -191,6 +193,9 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
     }
 
     public void openCamera(View v) {
+
+        FirebaseAuth.getInstance().signOut();
+        finish();
 
         int[] startingLocation = new int[2];
         v.getLocationOnScreen(startingLocation);
