@@ -4,6 +4,7 @@ package com.example.socialnetwork;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,6 +31,8 @@ import com.example.socialnetwork.model.Profile;
 import com.example.socialnetwork.model.User;
 import com.example.socialnetwork.view.RevealBackgroundView;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -38,6 +42,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 
@@ -46,6 +53,12 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
 
     private static final int USER_OPTIONS_ANIMATION_DELAY = 300;
     private static final Interpolator INTERPOLATOR = new DecelerateInterpolator();
+    final int RC_PHOTO_PICKER = 1;
+    static Uri downloadUri;
+
+    private StorageReference mChatPhotoStorageRef;
+    private FirebaseStorage mFirebaseStorage;
+    Uri selectedImageUri;
 
     RevealBackgroundView vRevealBackground;
 
@@ -72,6 +85,67 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
         startingActivity.startActivity(intent);
     }
 
+    public void EditDp(View view)
+    {
+        // TODO: Fire an intent to show an image picker
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/jpeg");
+        intent.putExtra(Intent.EXTRA_LOCAL_ONLY,true);
+        startActivityForResult(Intent.createChooser(intent,"Complete Action Using"),RC_PHOTO_PICKER);
+
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+
+
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RC_PHOTO_PICKER && resultCode == RESULT_OK) {
+
+            selectedImageUri = data.getData();
+
+        }
+
+
+    }
+
+
+    public void uploadImage()
+    {
+        //Get a reference to store file at image_photos/<FileName>
+        final StorageReference photoRef = mChatPhotoStorageRef.child(selectedImageUri.getLastPathSegment());
+
+
+        //Upload file to firebase storage
+        photoRef.putFile(selectedImageUri) .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                Toast.makeText(UserProfileActivity.this, "Image Uploaded Successfully", Toast.LENGTH_SHORT).show();
+                Task<Uri> downloadUri = taskSnapshot.getStorage().getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Uri> task) {
+
+                        String generatedFilePath = task.getResult().toString();
+                        System.out.println("yasir "+generatedFilePath);
+                        profilePhoto=generatedFilePath;
+                        updatedDp();
+
+                    }
+                });
+
+
+                }
+        })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+
+
+    }
+     Profile updateProfile = new Profile();
+
     public void setting(View view)
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -79,65 +153,114 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
         View viewInflated = LayoutInflater.from(this).inflate(R.layout.edit_profile_dialog, (ViewGroup) findViewById(android.R.id.content), false);
         final EditText userName = (EditText) viewInflated.findViewById(R.id.et_username);
         final EditText interest = (EditText) viewInflated.findViewById(R.id.et_interest);
-        final ImageView dp = (ImageView) viewInflated.findViewById(R.id.iv_editDp);
 
-        final Profile updateProfile = new Profile();
+
+
         builder.setView(viewInflated);
 
 // Set up the buttons
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(final DialogInterface dialog, int which) {
-                DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Profile");
-               Query query = ref.orderByChild("id").equalTo(FirebaseAuth.getInstance().getUid());
+                final DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Profile");
 
-                query.addValueEventListener(new ValueEventListener() {
+
+                    //uploadImage();
+
+
+              //  /Get a reference to store file at image_photos/<FileName>
+                final StorageReference photoRef = mChatPhotoStorageRef.child(selectedImageUri.getLastPathSegment());
+
+
+                //Upload file to firebase storage
+                photoRef.putFile(selectedImageUri) .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                        Toast.makeText(UserProfileActivity.this, "Image Uploaded Successfully", Toast.LENGTH_SHORT).show();
+                        Task<Uri> downloadUri = taskSnapshot.getStorage().getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Uri> task) {
+
+                                String generatedFilePath = task.getResult().toString();
+                                System.out.println("yasir "+generatedFilePath);
+                                profilePhoto=generatedFilePath;
+                                updatedDp();
 
 
-                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                            Profile profile = snapshot.getValue(Profile.class);
+                                // Setting Changes while editing profile
+                                Query query = ref.orderByChild("id").equalTo(FirebaseAuth.getInstance().getUid());
 
-
-                            if (profile.getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
-
-
-                                // If already present
-                                updateProfile.setId(profile.getId());
-                                updateProfile.setDp(profile.getDp());
-                                updateProfile.setFollowers(profile.getFollowers());
-                                updateProfile.setFollowing(profile.getFollowing());
-                                updateProfile.setPosts(profile.getPosts());
-
-                                updateProfile.setUserName(userName.getText().toString());
-                                updateProfile.setOccupation(interest.getText().toString());
-
-
-
-                                snapshot.getRef().setValue(updateProfile).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                query.addValueEventListener(new ValueEventListener() {
                                     @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                                        Toast.makeText(UserProfileActivity.this, "Updated Successfully", Toast.LENGTH_SHORT).show();
+
+                                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                            Profile profile = snapshot.getValue(Profile.class);
+
+
+                                            if (profile.getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+
+
+                                                // If already present
+                                                updateProfile.setId(profile.getId());
+
+                                                updateProfile.setFollowers(profile.getFollowers());
+                                                updateProfile.setFollowing(profile.getFollowing());
+                                                updateProfile.setPosts(profile.getPosts());
+
+                                                String name = userName.getText().toString();
+                                                String intr = interest.getText().toString();
+
+                                                if(name.length() < 2)
+                                                    name = profile.getUserName();
+
+
+                                                if(intr.length() < 3)
+                                                    intr= profile.getOccupation();
+
+
+                                                updateProfile.setDp( profilePhoto);
+
+                                                updateProfile.setUserName(name);
+                                                updateProfile.setOccupation(intr);
+
+                                                snapshot.getRef().setValue(updateProfile);
+
+
+
+                                            }
+
+                                        }
+
+
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
                                     }
                                 });
 
 
 
                             }
-
-                        }
-
+                        });
 
 
                     }
+                })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                            }
+                        });
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                    }
-                });
+
+
 
 
 
@@ -153,6 +276,17 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
         builder.show();
     }
 
+    public void updatedDp(){
+
+        Picasso.get()
+                .load(profilePhoto)
+                .placeholder(R.drawable.img_circle_placeholder)
+                .resize(avatarSize, avatarSize)
+                .centerCrop()
+                .transform(new CircleTransformation())
+                .into(ivUserProfilePhoto);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -160,7 +294,7 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
 
 
         this.avatarSize = getResources().getDimensionPixelSize(R.dimen.user_profile_avatar_size);
-        this.profilePhoto = getString(R.string.user_profile_photo);
+
 
         vRevealBackground = (RevealBackgroundView) findViewById(R.id.vRevealBackground);
         rvUserProfile = findViewById(R.id.rvUserProfile);
@@ -173,20 +307,18 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
         tvInstaUserName = findViewById(R.id.tv_insta_UserName);
         tvOccupation = findViewById(R.id.tvOccupation);
 
+        mFirebaseStorage = FirebaseStorage.getInstance();
+        mChatPhotoStorageRef = mFirebaseStorage.getReference().child("image_photos");
 
-        Picasso.get()
-                .load(profilePhoto)
-                .placeholder(R.drawable.img_circle_placeholder)
-                .resize(avatarSize, avatarSize)
-                .centerCrop()
-                .transform(new CircleTransformation())
-                .into(ivUserProfilePhoto);
+
+
 
 
       //  setupTabs();
         setupUserProfileGrid();
         setupRevealBackground(savedInstanceState);
         getData();
+
     }
 
    /* private void setupTabs() {
@@ -314,15 +446,16 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
 
 
                         // If already present
-                        snapshot.getRef().setValue(profile);
                         String name = profile.getUserName();
                         String occupation =  profile.getOccupation();
-
+                        profilePhoto = profile.getDp();
                         tvInstaUserName.setText(name);
                         tvOccupation.setText(occupation);
+                        updatedDp();
 
 
                     }
+
 
                 }
 

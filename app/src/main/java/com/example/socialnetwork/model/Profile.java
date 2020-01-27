@@ -10,7 +10,6 @@ public class Profile {
     private int following;
     private String dp;
 
-
     public String getId() {
         return id;
     }

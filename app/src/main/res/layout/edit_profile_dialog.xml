@@ -112,23 +112,34 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentStart="true">
+            <androidx.cardview.widget.CardView
+                android:layout_width="80dp"
+                android:layout_marginTop="30dp"
+                android:id="@+id/cvdp"
+                app:cardCornerRadius="40dp"
+                android:elevation="8dp"
 
-                <ImageView
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_height="80dp">
+
+                 <ImageView
                     android:id="@+id/iv_editDp"
+                     android:onClick="EditDp"
                     android:layout_width="88dp"
-                    android:layout_marginTop="30dp"
                     android:layout_height="88dp"
-                    android:layout_alignParentTop="true"
-                    android:layout_centerHorizontal="true"
                     android:src="@mipmap/ic_launcher" />
+
+            </androidx.cardview.widget.CardView>
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="90dp"
+                    android:layout_marginTop="95dp"
                     android:gravity="center"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentEnd="true"
-                    android:layout_alignTop="@id/iv_editDp"
+                    android:layout_alignTop="@id/cvdp"
                     android:text="Change Dp"/>
 
 
