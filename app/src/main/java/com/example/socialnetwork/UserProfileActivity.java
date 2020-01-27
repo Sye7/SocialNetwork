@@ -2,25 +2,34 @@ package com.example.socialnetwork;
 
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.example.socialnetwork.CircularImage.CircleTransformation;
 import com.example.socialnetwork.adapter.UserProfileAdapter;
+import com.example.socialnetwork.model.Profile;
 import com.example.socialnetwork.model.User;
 import com.example.socialnetwork.view.RevealBackgroundView;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -50,6 +59,8 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
     View vUserStats;
     View vUserProfileRoot;
     TextView tvUserName;
+    TextView tvInstaUserName;
+    TextView tvOccupation;
 
     private int avatarSize;
     private String profilePhoto;
@@ -59,6 +70,87 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
         Intent intent = new Intent(startingActivity, UserProfileActivity.class);
         intent.putExtra(ARG_REVEAL_START_LOCATION, startingLocation);
         startingActivity.startActivity(intent);
+    }
+
+    public void setting(View view)
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Edit Profile");
+        View viewInflated = LayoutInflater.from(this).inflate(R.layout.edit_profile_dialog, (ViewGroup) findViewById(android.R.id.content), false);
+        final EditText userName = (EditText) viewInflated.findViewById(R.id.et_username);
+        final EditText interest = (EditText) viewInflated.findViewById(R.id.et_interest);
+        final ImageView dp = (ImageView) viewInflated.findViewById(R.id.iv_editDp);
+
+        final Profile updateProfile = new Profile();
+        builder.setView(viewInflated);
+
+// Set up the buttons
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(final DialogInterface dialog, int which) {
+                DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Profile");
+               Query query = ref.orderByChild("id").equalTo(FirebaseAuth.getInstance().getUid());
+
+                query.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            Profile profile = snapshot.getValue(Profile.class);
+
+
+                            if (profile.getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+
+
+                                // If already present
+                                updateProfile.setId(profile.getId());
+                                updateProfile.setDp(profile.getDp());
+                                updateProfile.setFollowers(profile.getFollowers());
+                                updateProfile.setFollowing(profile.getFollowing());
+                                updateProfile.setPosts(profile.getPosts());
+
+                                updateProfile.setUserName(userName.getText().toString());
+                                updateProfile.setOccupation(interest.getText().toString());
+
+
+
+                                snapshot.getRef().setValue(updateProfile).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+
+                                        Toast.makeText(UserProfileActivity.this, "Updated Successfully", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
+
+
+                            }
+
+                        }
+
+
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+
+
+            }
+        });
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
     }
 
     @Override
@@ -78,6 +170,9 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
         vUserStats = findViewById(R.id.vUserStats);
         vUserProfileRoot = findViewById(R.id.vUserProfileRoot);
         tvUserName = findViewById(R.id.tvUserName);
+        tvInstaUserName = findViewById(R.id.tv_insta_UserName);
+        tvOccupation = findViewById(R.id.tvOccupation);
+
 
         Picasso.get()
                 .load(profilePhoto)
@@ -166,10 +261,12 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
     public void getData() {
 
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("User");
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("User");
+        DatabaseReference profileRef = FirebaseDatabase.getInstance().getReference("Profile");
 
 
-        Query query = reference.orderByChild("id").equalTo(firebaseUser.getUid());
+
+        Query query = userRef.orderByChild("id").equalTo(firebaseUser.getUid());
 
         query.addValueEventListener(new ValueEventListener() {
             @Override
@@ -201,6 +298,44 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
 
             }
         });
+
+         query = profileRef.orderByChild("id").equalTo(firebaseUser.getUid());
+
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Profile profile = snapshot.getValue(Profile.class);
+
+
+                    if (profile.getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+
+
+                        // If already present
+                        snapshot.getRef().setValue(profile);
+                        String name = profile.getUserName();
+                        String occupation =  profile.getOccupation();
+
+                        tvInstaUserName.setText(name);
+                        tvOccupation.setText(occupation);
+
+
+                    }
+
+                }
+
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
 
     }
 

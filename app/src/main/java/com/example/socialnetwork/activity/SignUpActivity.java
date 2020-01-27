@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.example.socialnetwork.R;
+import com.example.socialnetwork.model.Profile;
 import com.example.socialnetwork.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -136,6 +137,11 @@ public class SignUpActivity extends AppCompatActivity {
             Toast.makeText(this, "Enter valid UserName", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        Profile profile = new Profile(id,userName,"Blogger",0,0,0,"noo");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Profile");
+        ref.push().setValue(profile);
+
 
         User user = new User(userName, userEmail, userPass,id );
         reference.push().setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {

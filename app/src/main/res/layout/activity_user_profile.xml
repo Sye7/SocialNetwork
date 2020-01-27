@@ -9,11 +9,42 @@
         android:id="@+id/vRevealBackground"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
-    <include
+    
+    <androidx.appcompat.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
         android:id="@+id/toolbar"
-        layout="@layout/view_feed_toolbar" />
+        app:navigationIcon="@mipmap/ic_menu_white"
+        android:background="?attr/colorPrimary"
+        android:elevation="@dimen/default_elevation"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
+
+
+    <TextView
+        android:id="@+id/ivLogo"
+        android:layout_width="wrap_content"
+        android:text="ConnectionsMine"
+        android:gravity="center"
+        android:textColor="#fff"
+        android:fontFamily="@font/pacifico"
+        android:textSize="20sp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:scaleType="centerInside"
+        android:src="@mipmap/img_toolbar_logo" />
+
+        <ImageButton
+            android:id="@+id/ibEditProfile"
+            android:layout_width="30dp"
+            android:layout_marginEnd="15dp"
+            android:layout_height="30dp"
+            android:onClick="setting"
+            android:background="@drawable/setting"
+            android:layout_gravity="end"
+            />
+
+    </androidx.appcompat.widget.Toolbar>
 
 
 
@@ -84,6 +115,7 @@
 
                     <TextView
                         android:layout_width="match_parent"
+                        android:id="@+id/tv_insta_UserName"
                         android:layout_height="wrap_content"
                         android:text="\@say.ed_"
                         android:textColor="#bbbbbb"
@@ -91,6 +123,7 @@
 
                     <TextView
                         android:layout_width="match_parent"
+                        android:id="@+id/tvOccupation"
                         android:layout_height="wrap_content"
                         android:text="Mobile development passionate."
                         android:textColor="#ffffff"
