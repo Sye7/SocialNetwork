@@ -8,13 +8,23 @@ import android.view.animation.OvershootInterpolator;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.socialnetwork.adapter.FeedAdapter;
-import com.google.firebase.auth.FirebaseAuth;
+import com.example.socialnetwork.model.Post;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFeedItemClickListener,
@@ -26,6 +36,9 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
 
     TextView ivLogo;
     ImageButton btnCreate;
+    List<Post> postList;
+    private DatabaseReference mMessageDatabaseReference;
+    private ChildEventListener childEventListener;
 
 
     // Must use for recycle view
@@ -43,7 +56,8 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
         };
         rvFeed.setLayoutManager(linearLayoutManager);
 
-        feedAdapter = new FeedAdapter(this);
+        //feedAdapter = new FeedAdapter(this);
+        feedAdapter = new FeedAdapter(postList, this);
         rvFeed.setAdapter(feedAdapter);
         feedAdapter.setOnFeedItemClickListener(this);
 
@@ -99,6 +113,7 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
         feedAdapter.updateItems();
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,6 +125,10 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
         btnCreate = findViewById(R.id.btnCreate);
         inboxMenuItem = findViewById(R.id.msz);
 
+        postList = new ArrayList<>();
+
+        mMessageDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Post");
+
         setupFeed();
         startIntroAnimation();
 
@@ -120,7 +139,80 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
                 FeedContextMenuManager.getInstance().onScrolled(recyclerView, dx, dy);
             }
         });
+
+        attachDbReadListener();
     }
+
+    int id;
+    String photo;
+    String caption;
+    int likes;
+    String dp;
+    String userName;
+
+    private void attachDbReadListener() {
+
+        if (childEventListener == null) {
+            childEventListener = new ChildEventListener() {
+                @Override
+                public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                    Post p = (Post) dataSnapshot.getValue(Post.class);
+
+                    id = p.getId();
+                    photo = p.getPhoto();
+                    caption = p.getCaption();
+                    likes = p.getLikes();
+                    dp = p.getDp();
+                    userName = p.getUserName();
+
+                    postList.add(new Post(id,photo,caption,likes,dp,userName));
+
+                    feedAdapter.notifyDataSetChanged();
+
+
+                }
+
+                @Override
+                public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                }
+
+                @Override
+                public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                }
+
+                @Override
+                public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                }
+
+            };
+            mMessageDatabaseReference.addChildEventListener(childEventListener);
+
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        detachDbReadListener();
+    }
+
+
+
+
+    private void detachDbReadListener() {
+
+        if (childEventListener != null) {
+            mMessageDatabaseReference.removeEventListener(childEventListener);
+            childEventListener = null;
+        }
+    }
+
+
 
 
     // comment feed
@@ -191,13 +283,16 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
 
     public void openCamera(View v) {
 
-        FirebaseAuth.getInstance().signOut();
-        finish();
+        //FirebaseAuth.getInstance().signOut();
+        //finish();
 
         int[] startingLocation = new int[2];
         v.getLocationOnScreen(startingLocation);
         startingLocation[0] += v.getWidth() / 2;
-        CameraXImpl.startUserProfileFromLocation(startingLocation, this);
+        //CameraXImpl.startUserProfileFromLocation(startingLocation, this);
+
+        startActivity(new Intent(getApplicationContext(), CameraXNew.class));
+
         //  overridePendingTransition(0, 0);
 
 

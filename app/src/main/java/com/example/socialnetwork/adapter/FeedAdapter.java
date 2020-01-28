@@ -4,31 +4,33 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
-import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.socialnetwork.CircularImage.CircleTransformation;
 import com.example.socialnetwork.DoubleClickListener;
 import com.example.socialnetwork.R;
-import com.facebook.rebound.ui.Util;
+import com.example.socialnetwork.model.Post;
+import com.squareup.picasso.Picasso;
 import com.theophrast.ui.widget.SquareImageView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -48,10 +50,19 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     // like anim
     private final Map<Integer, Integer> likesCount = new HashMap<>();
 
+    List<Post> postList;
+    Activity myActivity;
+
     private static final int ANIMATED_ITEMS_COUNTS = 2;
     private Context context;
     private int lastAnimatedPosition = -1;
     private int itemsCount = 0;
+
+    public FeedAdapter(List<Post> postList, Activity activity)
+    {
+        this.postList = postList;
+        this.myActivity = activity;
+    }
 
     public FeedAdapter(Context context) {
         this.context = context;
@@ -208,11 +219,34 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
 
+    public void updatedDp(String pic, ImageView view){
+
+
+        Picasso.get()
+                .load(pic)
+                .placeholder(R.drawable.img_circle_placeholder)
+                .resize(88, 88)
+                .centerCrop()
+                .transform(new CircleTransformation())
+                .into(view);
+    }
+
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
 
+
         runEnterAnimation(viewHolder.itemView,position);
         CellFeedViewHolder holder = (CellFeedViewHolder) viewHolder;
+
+        Post post = postList.get(position);
+        holder.tsLikesCounter.setText(post.getLikes()+"");
+        holder.tvFeedBottom.setText(post.getCaption());
+        holder.tvnameFeed.setText(post.getUserName());
+        updatedDp(post.getDp(), holder.ivDpFeed);
+        updatedDp(post.getUserName(), holder.ivFeedCenter);
+
+
+/*
         if (position % 2 == 0) {
             holder.ivFeedCenter.setImageResource(R.mipmap.img_feed_center_1);
             holder.ivFeedBottom.setImageResource(R.mipmap.img_feed_bottom_1);
@@ -221,12 +255,14 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             holder.ivFeedBottom.setImageResource(R.mipmap.img_feed_bottom_2);
         }
 
+ */
+
 
         // like anim
         updateLikesCounter(holder, false);
 
         // red like button anim
-        updateHeartButton(holder, false);
+   /*     updateHeartButton(holder, false);
 
         holder.ivUserProfile.setTag(holder);
         holder.ivUserProfile.setOnClickListener(new View.OnClickListener() {
@@ -239,6 +275,8 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             }
         });
 
+
+    */
 
         holder.ivFeedCenter.setTag(holder);
         holder.ivFeedCenter.setOnClickListener(new DoubleClickListener() {
@@ -344,7 +382,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public int getItemCount() {
-        return itemsCount;
+        return postList.size();
     }
 
 
@@ -354,24 +392,28 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
 
-        ImageView ivFeedBottom;
+        TextView tvFeedBottom;
         SquareImageView ivFeedCenter;
         ImageButton btnMore;
         ImageButton btnComment;
         ImageButton btnLike;
+        ImageView ivDpFeed;
+        TextView tvnameFeed;
+
 
         View vBgLike;
         ImageView ivLike;
         TextSwitcher tsLikesCounter;
 
-        ImageView ivUserProfile;
 
 
         public CellFeedViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            ivFeedBottom = itemView.findViewById(R.id.ivFeedBottom);
+            tvFeedBottom = itemView.findViewById(R.id.ivFeedBottom);
+
             ivFeedCenter = itemView.findViewById(R.id.ivFeedCenter);
+
             btnMore = itemView.findViewById(R.id.btnMore);
             btnComment = itemView.findViewById(R.id.btnComments);
             btnLike = itemView.findViewById(R.id.btnLike);
@@ -379,9 +421,9 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             vBgLike = itemView.findViewById(R.id.vBgLike);
             tsLikesCounter = itemView.findViewById(R.id.tsLikesCounter);
             ivLike = itemView.findViewById(R.id.ivLike);
+            ivDpFeed = itemView.findViewById(R.id.ivDpFeed);
+            tvnameFeed = itemView.findViewById(R.id.tvUSerNameFeed);
 
-            // must be changed id
-            ivUserProfile = itemView.findViewById(R.id.profileHeart);
 
         }
     }

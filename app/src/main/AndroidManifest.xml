@@ -14,15 +14,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.SignUpActivity"></activity>
+        <activity android:name=".CameraXNew"></activity>
+        <activity android:name=".activity.SignUpActivity" />
         <activity android:name=".activity.StartActivity">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
-
         <activity android:name=".PublishActivity" />
         <activity android:name=".CameraXImpl" />
         <activity
@@ -33,9 +33,7 @@
             android:name=".CommentsActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.TransparentActivity" />
-        <activity android:name=".MainActivity">
-
-        </activity>
+        <activity android:name=".MainActivity"></activity>
 
         <meta-data
             android:name="preloaded_fonts"

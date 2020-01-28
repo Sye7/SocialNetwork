@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
@@ -88,6 +87,9 @@ public class PublishActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_publish);
 
+        Intent intent = getIntent();
+        path = intent.getStringExtra("path");
+
         ivPhoto = findViewById(R.id.ivPhoto);
         imageShareMock = findViewById(R.id.iv_preview);
         btn_publish = findViewById(R.id.btn_publish);
@@ -95,12 +97,13 @@ public class PublishActivity extends AppCompatActivity {
 
 
 
-         path = Environment.getExternalStorageDirectory().toString();
-         fOut = null;
-         file = new File(path, "Insta"+counter+".jpg"); // the File to save , append increasing numeric counter to prevent files from getting overwritten.
-         counter++;
+        // path = Environment.getExternalStorageDirectory().toString();
+         //fOut = null;
+         //file = new File(path, "Insta"+counter+".jpg"); // the File to save , append increasing numeric counter to prevent files from getting overwritten.
+         //counter++;
 
-        pictureBitmap = Bitmap.createBitmap(BitmapFactory.decodeByteArray(CameraXImpl.pic,0,CameraXImpl.pic.length));
+       // pictureBitmap = Bitmap.createBitmap(BitmapFactory.decodeByteArray(CameraXImpl.pic,0,CameraXImpl.pic.length));
+        pictureBitmap = BitmapFactory.decodeFile(path);
 
         loadThumbnailPhoto();
 
