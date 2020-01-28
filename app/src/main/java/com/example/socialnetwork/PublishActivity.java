@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
@@ -13,12 +12,26 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.socialnetwork.model.Post;
+import com.example.socialnetwork.model.Profile;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 
 public class PublishActivity extends AppCompatActivity {
@@ -47,12 +60,98 @@ public class PublishActivity extends AppCompatActivity {
 
     }
 
+    String id;
+    String photo;
+    String caption;
+    int likes;
+    String dp;
+    String userName;
+
+    private void uploadImage(Bitmap bitmap) {
+
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 20, baos);
+
+        byte[] data = baos.toByteArray();
+        UploadTask uploadTask = mChatPhotoStorageRef.putBytes(data);
+        uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+
+                String generatedFilePath = task.getResult().toString();
+                System.out.println("yasir "+generatedFilePath);
+                photo = generatedFilePath;
+
+            }
+        });
+
+    }
     public void publish (View v)
     {
-        Toast.makeText(this, "Photo Uploaded Successfully", Toast.LENGTH_SHORT).show();
+        likes =0;
+        caption = status.getText().toString();
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Profile");
+
+
+        uploadImage(pictureBitmap);
+
+        //  /Get a reference to store file at image_photos/<FileName>
+        final StorageReference photoRef = mChatPhotoStorageRef;
+
+        // Setting Changes while editing profile
+        final Query query = ref.orderByChild("id").equalTo(FirebaseAuth.getInstance().getUid());
+
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Profile profile = snapshot.getValue(Profile.class);
+
+
+                    if (profile.getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+
+
+                        // If already present
+                        id = (profile.getId());
+                        dp = profile.getDp();
+                        userName = profile.getUserName();
+
+
+                    }
+
+                }
+
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        Post post = new Post(id, photo, caption, likes, dp, userName);
+
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Post");
+        databaseReference.push().setValue(post).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                finish();
+            }
+        });
+
+
+
+
+
         // Save image locally
 
-        try {
+      /*  try {
             fOut = new FileOutputStream(file);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -77,10 +176,17 @@ public class PublishActivity extends AppCompatActivity {
             }
         }).start();
 
+
+       */
+
     }
 
     String path;
     static int counter=0;
+
+    private StorageReference mChatPhotoStorageRef;
+    private FirebaseStorage mFirebaseStorage;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +200,10 @@ public class PublishActivity extends AppCompatActivity {
         imageShareMock = findViewById(R.id.iv_preview);
         btn_publish = findViewById(R.id.btn_publish);
         photoSize = getResources().getDimensionPixelSize(R.dimen.publish_photo_thumbnail_size);
+        status = findViewById(R.id.etDescription);
+
+        mFirebaseStorage = FirebaseStorage.getInstance();
+        mChatPhotoStorageRef = mFirebaseStorage.getReference().child("image_photos");
 
 
 

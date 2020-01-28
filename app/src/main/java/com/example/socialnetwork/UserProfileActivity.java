@@ -108,42 +108,6 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
 
     }
 
-
-    public void uploadImage()
-    {
-        //Get a reference to store file at image_photos/<FileName>
-        final StorageReference photoRef = mChatPhotoStorageRef.child(selectedImageUri.getLastPathSegment());
-
-
-        //Upload file to firebase storage
-        photoRef.putFile(selectedImageUri) .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
-                Toast.makeText(UserProfileActivity.this, "Image Uploaded Successfully", Toast.LENGTH_SHORT).show();
-                Task<Uri> downloadUri = taskSnapshot.getStorage().getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Uri> task) {
-
-                        String generatedFilePath = task.getResult().toString();
-                        System.out.println("yasir "+generatedFilePath);
-                        profilePhoto=generatedFilePath;
-                        updatedDp();
-
-                    }
-                });
-
-
-                }
-        })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                    }
-                });
-
-
-    }
      Profile updateProfile = new Profile();
 
     public void setting(View view)

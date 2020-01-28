@@ -1,7 +1,7 @@
 package com.example.socialnetwork.model;
 
 public class Post {
-    private int id;
+    private String id;
     private String photo;
     private String caption;
     private int likes;
@@ -24,7 +24,7 @@ public class Post {
         this.userName = userName;
     }
 
-    public Post(int id, String photo, String caption, int likes, String dp, String userName) {
+    public Post(String id, String photo, String caption, int likes, String dp, String userName) {
         this.id = id;
         this.photo = photo;
         this.caption = caption;
@@ -36,11 +36,11 @@ public class Post {
     public Post() {
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
         attachDbReadListener();
     }
 
-    int id;
+    String id;
     String photo;
     String caption;
     int likes;
