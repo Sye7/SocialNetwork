@@ -28,7 +28,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import com.example.socialnetwork.CircularImage.CircleTransformation;
 import com.example.socialnetwork.adapter.UserProfileAdapter;
 import com.example.socialnetwork.model.Profile;
-import com.example.socialnetwork.model.User;
+import com.example.socialnetwork.model.UserLoginModel;
 import com.example.socialnetwork.view.RevealBackgroundView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -133,95 +133,152 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
 
 
               //  /Get a reference to store file at image_photos/<FileName>
-                final StorageReference photoRef = mChatPhotoStorageRef.child(selectedImageUri.getLastPathSegment());
+                if(selectedImageUri !=null) {
+
+                    final StorageReference photoRef = mChatPhotoStorageRef.child(selectedImageUri.getLastPathSegment());
 
 
-                //Upload file to firebase storage
-                photoRef.putFile(selectedImageUri) .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    //Upload file to firebase storage
+                    photoRef.putFile(selectedImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
-                        Toast.makeText(UserProfileActivity.this, "Image Uploaded Successfully", Toast.LENGTH_SHORT).show();
-                        Task<Uri> downloadUri = taskSnapshot.getStorage().getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Uri> task) {
+                            Toast.makeText(UserProfileActivity.this, "Image Uploaded Successfully", Toast.LENGTH_SHORT).show();
+                            Task<Uri> downloadUri = taskSnapshot.getStorage().getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Uri> task) {
 
-                                String generatedFilePath = task.getResult().toString();
-                                System.out.println("yasir "+generatedFilePath);
-                                profilePhoto=generatedFilePath;
-                                updatedDp();
-
-
-                                // Setting Changes while editing profile
-                                Query query = ref.orderByChild("id").equalTo(FirebaseAuth.getInstance().getUid());
-
-                                query.addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    String generatedFilePath = task.getResult().toString();
+                                    System.out.println("yasir " + generatedFilePath);
+                                    profilePhoto = generatedFilePath;
+                                    updatedDp();
 
 
-                                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                            Profile profile = snapshot.getValue(Profile.class);
+                                    // Setting Changes while editing profile
+                                    Query query = ref.orderByChild("id").equalTo(FirebaseAuth.getInstance().getUid());
+
+                                    query.addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
 
-                                            if (profile.getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                                Profile profile = snapshot.getValue(Profile.class);
 
 
-                                                // If already present
-                                                updateProfile.setId(profile.getId());
-
-                                                updateProfile.setFollowers(profile.getFollowers());
-                                                updateProfile.setFollowing(profile.getFollowing());
-                                                updateProfile.setPosts(profile.getPosts());
-
-                                                String name = userName.getText().toString();
-                                                String intr = interest.getText().toString();
-
-                                                if(name.length() < 2)
-                                                    name = profile.getUserName();
+                                                if (profile.getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
 
 
-                                                if(intr.length() < 3)
-                                                    intr= profile.getOccupation();
+                                                    // If already present
+                                                    updateProfile.setId(profile.getId());
+
+                                                    updateProfile.setFollowers(profile.getFollowers());
+                                                    updateProfile.setFollowing(profile.getFollowing());
+                                                    updateProfile.setPosts(profile.getPosts());
+
+                                                    String name = userName.getText().toString();
+                                                    String intr = interest.getText().toString();
+
+                                                    if (name.length() < 2)
+                                                        name = profile.getUserName();
 
 
-                                                updateProfile.setDp( profilePhoto);
-
-                                                updateProfile.setUserName(name);
-                                                updateProfile.setOccupation(intr);
-
-                                                snapshot.getRef().setValue(updateProfile);
+                                                    if (intr.length() < 3)
+                                                        intr = profile.getOccupation();
 
 
+                                                    updateProfile.setDp(profilePhoto);
+
+                                                    updateProfile.setUserName(name);
+                                                    updateProfile.setOccupation(intr);
+
+                                                    snapshot.getRef().setValue(updateProfile);
+
+
+                                                }
 
                                             }
 
+
                                         }
 
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
 
 
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                    }
-                                });
+                                }
+                            });
 
 
+                        }
+                    })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                }
+                            });
+                }
+                else{
+                    Query query = ref.orderByChild("id").equalTo(FirebaseAuth.getInstance().getUid());
+
+                    query.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+
+                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                Profile profile = snapshot.getValue(Profile.class);
+
+
+                                if (profile.getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+
+
+                                    // If already present
+                                    updateProfile.setId(profile.getId());
+
+                                    updateProfile.setFollowers(profile.getFollowers());
+                                    updateProfile.setFollowing(profile.getFollowing());
+                                    updateProfile.setPosts(profile.getPosts());
+
+                                    String name = userName.getText().toString();
+                                    String intr = interest.getText().toString();
+
+                                    if (name.length() < 2)
+                                        name = profile.getUserName();
+
+
+                                    if (intr.length() < 3)
+                                        intr = profile.getOccupation();
+
+                                    // changes
+
+                                    updateProfile.setDp(profile.getDp());
+
+                                    updateProfile.setUserName(name);
+                                    updateProfile.setOccupation(intr);
+
+                                    snapshot.getRef().setValue(updateProfile);
+
+
+                                }
 
                             }
-                        });
 
 
-                    }
-                })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                            }
-                        });
+                        }
 
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+
+
+
+                }
 
 
 
@@ -357,7 +414,7 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
     public void getData() {
 
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("User");
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("UserLoginModel");
         DatabaseReference profileRef = FirebaseDatabase.getInstance().getReference("Profile");
 
 
@@ -370,14 +427,14 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
 
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    User user = snapshot.getValue(User.class);
+                    UserLoginModel userLoginModel = snapshot.getValue(UserLoginModel.class);
 
 
-                    if (user.getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                    if (userLoginModel.getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
 
 
                         // If already present
-                        String name = user.getName();
+                        String name = userLoginModel.getName();
                        tvUserName.setText(name);
 
 

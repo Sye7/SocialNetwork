@@ -4,15 +4,20 @@ package com.example.socialnetwork;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Rational;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -30,6 +35,7 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
 
 import java.io.File;
+import java.io.IOException;
 
 public class CameraXNew extends AppCompatActivity {
 
@@ -38,10 +44,56 @@ public class CameraXNew extends AppCompatActivity {
             "android.permission.WRITE_EXTERNAL_STORAGE"};
     TextureView textureView;
     ConstraintLayout layout;
+    final int RC_PHOTO_PICKER = 1;
+    Uri selectedImageUri;
+
+    static Bitmap bitmap;
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+
+
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RC_PHOTO_PICKER && resultCode == RESULT_OK) {
+
+            selectedImageUri = data.getData();
+
+            try {
+                 bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImageUri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Intent inte = new Intent(getApplicationContext(), PublishActivity.class);
+            inte.putExtra("path",  "bitmap");
+            startActivity(inte);
+
+
+        }
+
+
+    }
+
+    public void EditDp(View view)
+    {
+        // TODO: Fire an intent to show an image picker
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/jpeg");
+        intent.putExtra(Intent.EXTRA_LOCAL_ONLY,true);
+        startActivityForResult(Intent.createChooser(intent,"Complete Action Using"),RC_PHOTO_PICKER);
+
+
+
+
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+
         setContentView(R.layout.activity_camera_xnew);
 
 
@@ -89,7 +141,9 @@ public class CameraXNew extends AppCompatActivity {
 
     private void startCamera() {
 
+
         CameraX.unbindAll();
+
 
         Rational aspectRatio = new Rational(textureView.getWidth(), textureView.getHeight());
         Size screen = new Size(textureView.getWidth(), textureView.getHeight());
@@ -149,6 +203,8 @@ public class CameraXNew extends AppCompatActivity {
 
         CameraX.bindToLifecycle((LifecycleOwner)this, preview, imgCap);
     }
+
+
 
     private void updateTransform(){
 

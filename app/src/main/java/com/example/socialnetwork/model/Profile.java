@@ -10,6 +10,12 @@ public class Profile {
     private int following;
     private String dp;
 
+    public Profile(String id, String userName, String dp) {
+        this.id = id;
+        this.userName = userName;
+        this.dp = dp;
+    }
+
     public String getId() {
         return id;
     }

@@ -1,6 +1,6 @@
 package com.example.socialnetwork.model;
 
-public class User {
+public class UserLoginModel {
     private String name;
     private String email;
     private String password;
@@ -14,12 +14,12 @@ public class User {
         this.id = id;
     }
 
-    public User() {
+    public UserLoginModel() {
     }
 
     @Override
     public String toString() {
-        return "User{" +
+        return "UserLoginModel{" +
                 "name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
@@ -27,7 +27,7 @@ public class User {
                 '}';
     }
 
-    public User(String name, String email, String password, String id) {
+    public UserLoginModel(String name, String email, String password, String id) {
         this.name = name;
         this.email = email;
         this.password = password;

@@ -14,7 +14,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".CameraXNew"></activity>
+        <activity android:name=".ChatAllEntities.ChatActivity"></activity>
+        <activity android:name=".ChatAllEntities.MessageActivity" />
+        <activity android:name=".CameraXNew" />
         <activity android:name=".activity.SignUpActivity" />
         <activity android:name=".activity.StartActivity">
             <intent-filter>
@@ -33,7 +35,7 @@
             android:name=".CommentsActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.TransparentActivity" />
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".MainActivity" />
 
         <meta-data
             android:name="preloaded_fonts"

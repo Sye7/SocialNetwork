@@ -17,7 +17,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.example.socialnetwork.R;
 import com.example.socialnetwork.model.Profile;
-import com.example.socialnetwork.model.User;
+import com.example.socialnetwork.model.UserLoginModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -59,7 +59,7 @@ public class SignUpActivity extends AppCompatActivity {
         signin = (Button) findViewById(R.id.signin);
 
         mAuth = FirebaseAuth.getInstance();
-        reference = FirebaseDatabase.getInstance().getReference("User");
+        reference = FirebaseDatabase.getInstance().getReference("UserLoginModel");
 
 
         signup.setOnClickListener(new View.OnClickListener() {
@@ -143,8 +143,8 @@ public class SignUpActivity extends AppCompatActivity {
         ref.push().setValue(profile);
 
 
-        User user = new User(userName, userEmail, userPass,id );
-        reference.push().setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+        UserLoginModel userLoginModel = new UserLoginModel(userName, userEmail, userPass,id );
+        reference.push().setValue(userLoginModel).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
 

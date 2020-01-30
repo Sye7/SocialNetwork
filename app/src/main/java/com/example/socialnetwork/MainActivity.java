@@ -2,11 +2,13 @@ package com.example.socialnetwork;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,8 +17,11 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.socialnetwork.ChatAllEntities.ChatActivity;
 import com.example.socialnetwork.adapter.FeedAdapter;
 import com.example.socialnetwork.model.Post;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -39,6 +44,37 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
     List<Post> postList;
     private DatabaseReference mMessageDatabaseReference;
     private ChildEventListener childEventListener;
+
+
+    boolean backPressToExit = false;
+    View view;
+
+    @Override
+    public void onBackPressed() {
+
+
+        if (backPressToExit) {
+
+            Intent a = new Intent(Intent.ACTION_MAIN);
+            a.addCategory(Intent.CATEGORY_HOME);
+            a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(a);
+        }
+
+        Snackbar.make(ivLogo,"Back Again to Exit",Snackbar.LENGTH_SHORT).show();
+
+        this.backPressToExit = true;
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                backPressToExit = false;
+            }
+        }, 2000);
+
+
+    }
+
 
 
     // Must use for recycle view
@@ -124,6 +160,22 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
         ivLogo = findViewById(R.id.ivLogo);
         btnCreate = findViewById(R.id.btnCreate);
         inboxMenuItem = findViewById(R.id.msz);
+
+        inboxMenuItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), ChatActivity.class));
+
+            }
+        });
+
+        ivLogo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                FirebaseAuth.getInstance().signOut();
+            }
+        });
 
         postList = new ArrayList<>();
 
@@ -283,16 +335,9 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
 
     public void openCamera(View v) {
 
-        //FirebaseAuth.getInstance().signOut();
-        //finish();
+       // startActivity(new Intent(getApplicationContext(), UserProfileActivity.class ));
 
-        int[] startingLocation = new int[2];
-        v.getLocationOnScreen(startingLocation);
-        startingLocation[0] += v.getWidth() / 2;
-        //CameraXImpl.startUserProfileFromLocation(startingLocation, this);
-
-        startActivity(new Intent(getApplicationContext(), CameraXNew.class));
-
+          startActivity(new Intent(getApplicationContext(), CameraXNew.class));
         //  overridePendingTransition(0, 0);
 
 

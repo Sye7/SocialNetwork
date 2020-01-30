@@ -3,6 +3,7 @@ package com.example.socialnetwork;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -18,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.socialnetwork.model.Post;
 import com.example.socialnetwork.model.Profile;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -71,30 +73,33 @@ public class PublishActivity extends AppCompatActivity {
 
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 20, baos);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 40, baos);
 
         byte[] data = baos.toByteArray();
-        UploadTask uploadTask = mChatPhotoStorageRef.putBytes(data);
-        uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+        final UploadTask uploadTask = (UploadTask) mChatPhotoStorageRef.putBytes(data).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
-                String generatedFilePath = task.getResult().toString();
-                System.out.println("yasir "+generatedFilePath);
-                photo = generatedFilePath;
+                Task<Uri> downloadUri =taskSnapshot.getStorage().getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Uri> task) {
 
+                        String generatedFilePath = task.getResult().toString();
+                        System.out.println("yasir "+generatedFilePath);
+                        photo = generatedFilePath;
+
+                        uploadPost();
+
+                    }
+                });
             }
         });
 
     }
-    public void publish (View v)
-    {
-        likes =0;
-        caption = status.getText().toString();
+
+    public void uploadPost(){
+
         final DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Profile");
-
-
-        uploadImage(pictureBitmap);
 
         //  /Get a reference to store file at image_photos/<FileName>
         final StorageReference photoRef = mChatPhotoStorageRef;
@@ -119,6 +124,20 @@ public class PublishActivity extends AppCompatActivity {
                         dp = profile.getDp();
                         userName = profile.getUserName();
 
+                        Post post = new Post(id, photo, caption, likes, dp, userName);
+
+                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Post");
+                        databaseReference.push().setValue(post).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+
+                                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                                finish();
+                            }
+                        });
+
+
+
 
                     }
 
@@ -133,19 +152,16 @@ public class PublishActivity extends AppCompatActivity {
 
             }
         });
-        Post post = new Post(id, photo, caption, likes, dp, userName);
-
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Post");
-        databaseReference.push().setValue(post).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-
-                startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                finish();
-            }
-        });
 
 
+
+    }
+    public void publish (View v)
+    {
+        likes =0;
+        caption = status.getText().toString();
+
+        uploadImage(pictureBitmap);
 
 
 
@@ -187,6 +203,14 @@ public class PublishActivity extends AppCompatActivity {
     private StorageReference mChatPhotoStorageRef;
     private FirebaseStorage mFirebaseStorage;
 
+    public Bitmap fixOrientation( Bitmap mBitmap) {
+        if (mBitmap.getWidth() > mBitmap.getHeight()) {
+            Matrix matrix = new Matrix();
+            matrix.postRotate(90);
+            mBitmap = Bitmap.createBitmap(mBitmap , 0, 0, mBitmap.getWidth(), mBitmap.getHeight(), matrix, true);
+        }
+        return mBitmap;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -203,7 +227,7 @@ public class PublishActivity extends AppCompatActivity {
         status = findViewById(R.id.etDescription);
 
         mFirebaseStorage = FirebaseStorage.getInstance();
-        mChatPhotoStorageRef = mFirebaseStorage.getReference().child("image_photos");
+        mChatPhotoStorageRef = mFirebaseStorage.getReference().child("post/").child(Math.random()+"");
 
 
 
@@ -213,7 +237,19 @@ public class PublishActivity extends AppCompatActivity {
          //counter++;
 
        // pictureBitmap = Bitmap.createBitmap(BitmapFactory.decodeByteArray(CameraXImpl.pic,0,CameraXImpl.pic.length));
-        pictureBitmap = BitmapFactory.decodeFile(path);
+       if(path.equals("bitmap"))
+            pictureBitmap = CameraXNew.bitmap;
+        else
+            pictureBitmap = BitmapFactory.decodeFile(path);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                pictureBitmap =  fixOrientation(pictureBitmap);
+
+            }
+        }).start();
+
 
         loadThumbnailPhoto();
 
