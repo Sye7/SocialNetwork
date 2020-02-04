@@ -66,6 +66,8 @@ public class RevealBackgroundView extends View {
     }
 
     public void startFromLocation(int[] tapLocationOnScreen) {
+
+
         changeState(STATE_FILL_STARTED);
         startLocationX = tapLocationOnScreen[0];
         startLocationY = tapLocationOnScreen[1];

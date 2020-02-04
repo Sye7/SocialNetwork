@@ -2,11 +2,13 @@ package com.example.socialnetwork;
 
 
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -22,6 +24,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GestureDetectorCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
@@ -29,6 +32,7 @@ import com.example.socialnetwork.CircularImage.CircleTransformation;
 import com.example.socialnetwork.adapter.UserProfileAdapter;
 import com.example.socialnetwork.model.Profile;
 import com.example.socialnetwork.model.UserLoginModel;
+import com.example.socialnetwork.swipe_listener.OnSwipeListener;
 import com.example.socialnetwork.view.RevealBackgroundView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -48,7 +52,11 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 
-public class UserProfileActivity extends AppCompatActivity implements RevealBackgroundView.OnStateChangeListener {
+
+// Circular Reveal
+
+public class UserProfileActivity extends AppCompatActivity implements RevealBackgroundView.OnStateChangeListener,
+        View.OnTouchListener  {
     public static final String ARG_REVEAL_START_LOCATION = "reveal_start_location";
 
     private static final int USER_OPTIONS_ANIMATION_DELAY = 300;
@@ -75,15 +83,31 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
     TextView tvInstaUserName;
     TextView tvOccupation;
 
+
+
+
     private int avatarSize;
     private String profilePhoto;
     private UserProfileAdapter userPhotosAdapter;
+
+    public  void showStory(View view){
+
+        startActivity(new Intent(getApplicationContext(), StoryStatus.class));
+    }
+
+
+
 
     public static void startUserProfileFromLocation(int[] startingLocation, Activity startingActivity) {
         Intent intent = new Intent(startingActivity, UserProfileActivity.class);
         intent.putExtra(ARG_REVEAL_START_LOCATION, startingLocation);
         startingActivity.startActivity(intent);
     }
+
+
+
+
+
 
     public void EditDp(View view)
     {
@@ -309,6 +333,14 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
     }
 
     @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        gestureDetector.onTouchEvent(event);
+        return true;
+    }
+    GestureDetectorCompat gestureDetector;
+
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
@@ -328,36 +360,101 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
         tvInstaUserName = findViewById(R.id.tv_insta_UserName);
         tvOccupation = findViewById(R.id.tvOccupation);
 
+
         mFirebaseStorage = FirebaseStorage.getInstance();
         mChatPhotoStorageRef = mFirebaseStorage.getReference().child("image_photos");
 
+        OnSwipeListener onSwipeListenerUpDown = generateSwipeListenerForStory();
+        gestureDetector = new GestureDetectorCompat(this, onSwipeListenerUpDown);
+        rvUserProfile.setOnTouchListener(this);
 
-
-
-
-      //  setupTabs();
         setupUserProfileGrid();
         setupRevealBackground(savedInstanceState);
         getData();
 
     }
 
-   /* private void setupTabs() {
-        tlUserProfileTabs.addTab(tlUserProfileTabs.newTab().setIcon(R.drawable.ic_grid_on_white));
-        tlUserProfileTabs.addTab(tlUserProfileTabs.newTab().setIcon(R.drawable.ic_list_white));
-        tlUserProfileTabs.addTab(tlUserProfileTabs.newTab().setIcon(R.drawable.ic_place_white));
-        tlUserProfileTabs.addTab(tlUserProfileTabs.newTab().setIcon(R.drawable.ic_label_white));
+
+    private  OnSwipeListener generateSwipeListenerForStory() {
+
+        OnSwipeListener onSwipeListener = new OnSwipeListener() {
+
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+
+                // Grab two events located on the plane at e1=(x1, y1) and e2=(x2, y2)
+                // Let e1 be the initial event
+                // e2 can be located at 4 different positions, consider the following diagram
+                // (Assume that lines are separated by 90 degrees.)
+                //
+                //
+                //         \ A  /
+                //          \  /
+                //       D   e1   B
+                //          /  \
+                //         / C  \
+                //
+                // So if (x2,y2) falls in region:
+                //  A => it's an UP swipe
+                //  B => it's a RIGHT swipe
+                //  C => it's a DOWN swipe
+                //  D => it's a LEFT swipe
+                //
+
+                float x1 = e1.getX();
+                float y1 = e1.getY();
+
+                float x2 = e2.getX();
+                float y2 = e2.getY();
+
+                Direction direction = getDirection(x1,y1,x2,y2);
+                return onSwipe(direction);
+            }
+
+
+
+            @Override
+            public boolean onSwipe(Direction direction) {
+
+                // Possible implementation
+
+
+                 if(direction == OnSwipeListener.Direction.right){
+                    Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                    Bundle bndlAnimation = ActivityOptions.makeCustomAnimation(getApplicationContext(),R.anim.left_to_rigth_for_lr, R.anim.right_to_left_for_lr).toBundle();
+                    startActivity(intent, bndlAnimation);
+                    finish();
+                    return true;
+
+                }
+
+
+                return super.onSwipe(direction);
+            }
+        };
+
+        return onSwipeListener;
+
     }
-    */
+
+
 
 
     private void setupRevealBackground(Bundle savedInstanceState) {
         vRevealBackground.setOnStateChangeListener(this);
         if (savedInstanceState == null) {
+
             final int[] startingLocation = getIntent().getIntArrayExtra(ARG_REVEAL_START_LOCATION);
             vRevealBackground.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
                 @Override
                 public boolean onPreDraw() {
+
+                    // Change starting point of reveal
+
+                    int[] startingLocation = new int[2];
+                    vUserDetails.getLocationOnScreen(startingLocation);
+                    startingLocation[0] += vUserDetails.getWidth() / 2;
+
                     vRevealBackground.getViewTreeObserver().removeOnPreDrawListener(this);
                     vRevealBackground.startFromLocation(startingLocation);
                     return false;
@@ -369,7 +466,10 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
         }
     }
 
+
+
     private void setupUserProfileGrid() {
+
         final StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
         rvUserProfile.setLayoutManager(layoutManager);
         rvUserProfile.setOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -492,5 +592,6 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
 
 
     }
+
 
 }

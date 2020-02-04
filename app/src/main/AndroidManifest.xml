@@ -14,7 +14,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ChatAllEntities.ChatActivity"></activity>
+        <activity android:name=".StoryStatus"></activity>
+        <activity android:name=".ChatAllEntities.ChatActivity" />
         <activity android:name=".ChatAllEntities.MessageActivity" />
         <activity android:name=".CameraXNew" />
         <activity android:name=".activity.SignUpActivity" />

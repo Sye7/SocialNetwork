@@ -1,25 +1,31 @@
 package com.example.socialnetwork;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
+import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.OvershootInterpolator;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GestureDetectorCompat;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.socialnetwork.ChatAllEntities.ChatActivity;
 import com.example.socialnetwork.adapter.FeedAdapter;
+import com.example.socialnetwork.adapter.StoryAdapter;
 import com.example.socialnetwork.model.Post;
+import com.example.socialnetwork.model.Story;
+import com.example.socialnetwork.swipe_listener.OnSwipeListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -33,21 +39,23 @@ import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFeedItemClickListener,
-        FeedContextMenu.OnFeedContextMenuItemClickListener {
+        FeedContextMenu.OnFeedContextMenuItemClickListener, View.OnTouchListener {
 
     private FeedAdapter feedAdapter;
     Toolbar toolbar;
     RecyclerView rvFeed;
 
     TextView ivLogo;
-    ImageButton btnCreate;
     List<Post> postList;
     private DatabaseReference mMessageDatabaseReference;
     private ChildEventListener childEventListener;
-
-
+   public static String storyId = "";
     boolean backPressToExit = false;
-    View view;
+    // Up down gestures
+    GestureDetectorCompat  gestureDetector;
+
+
+
 
     @Override
     public void onBackPressed() {
@@ -91,11 +99,24 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
 
         };
         rvFeed.setLayoutManager(linearLayoutManager);
+        rvFeed.setItemAnimator(new DefaultItemAnimator());
 
         //feedAdapter = new FeedAdapter(this);
         feedAdapter = new FeedAdapter(postList, this);
         rvFeed.setAdapter(feedAdapter);
         feedAdapter.setOnFeedItemClickListener(this);
+
+    }
+
+    private void setupStory()
+    {
+        storyLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+
+        storyRecyclerView.setLayoutManager(storyLayoutManager);
+        storyRecyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        storyAdapter = new StoryAdapter(storyData, this);
+        storyRecyclerView.setAdapter(storyAdapter);
 
     }
 
@@ -110,7 +131,6 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
     private static final int ANIM_DURATION_TOOLBAR = 300;
 
     private void startIntroAnimation() {
-        btnCreate.setTranslationY(2 * getResources().getDimensionPixelOffset(R.dimen.btn_fab_size));
 
         int actionbarSize = dpToPx(56);
         toolbar.setTranslationY(-actionbarSize);
@@ -132,21 +152,51 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
                 .setStartDelay(700)
                 .start();
 
-        startContentAnimation();
+        feedAdapter.updateItems();
+
     }
 
     //FAB animation
     private static final int ANIM_DURATION_FAB = 400;
     ImageButton inboxMenuItem;
 
-    private void startContentAnimation() {
-        btnCreate.animate()
-                .translationY(0)
-                .setInterpolator(new OvershootInterpolator(1.f))
-                .setStartDelay(1000)
-                .setDuration(ANIM_DURATION_FAB)
-                .start();
-        feedAdapter.updateItems();
+    // Bottom Story
+    private static RecyclerView.Adapter storyAdapter;
+    private RecyclerView.LayoutManager storyLayoutManager;
+    private static RecyclerView storyRecyclerView;
+    private static ArrayList<Story> storyData;
+
+    // RecycleerView Hide and Show
+
+    View storyFragment;
+
+    private void startStoryFragmentAnimUp() {
+
+        TranslateAnimation animate = new TranslateAnimation(
+                0,                 // fromXDelta
+                0,                 // toXDelta
+                storyFragment.getHeight(),  // fromYDelta
+                0);                // toYDelta
+        animate.setDuration(500);
+        storyFragment.startAnimation(animate);
+    }
+
+    private void startStoryFragmentAnimDown()
+    {
+        TranslateAnimation animate = new TranslateAnimation(
+                0,                 // fromXDelta
+                0,                 // toXDelta
+                0,                 // fromYDelta
+                storyFragment.getHeight()+500); // toYDelta
+        animate.setDuration(500);
+        storyFragment.startAnimation(animate);
+
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        gestureDetector.onTouchEvent(event);
+        return true;
     }
 
 
@@ -158,8 +208,71 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
         rvFeed = findViewById(R.id.rvFeed);
 
         ivLogo = findViewById(R.id.ivLogo);
-        btnCreate = findViewById(R.id.btnCreate);
         inboxMenuItem = findViewById(R.id.msz);
+        rvFeed.setHasFixedSize(true);
+        storyFragment = findViewById(R.id.storyViewModeFragment);
+        storyRecyclerView = findViewById(R.id.rvStory);
+        storyRecyclerView.setHasFixedSize(true);
+        storyData = new ArrayList<>();
+
+        Story s1 = new Story(FirebaseAuth.getInstance().getUid(), "Itachi Uchiha","https://firebasestorage.googleapis.com/v0/b/connectionsmine.appspot.com/o/image_photos%2Fimage%3A206953?alt=media&token=5fd0444c-b758-45af-98ba-f49586a94239");
+        Story s2 = new Story(FirebaseAuth.getInstance().getUid(), "Madara Uchiha","https://firebasestorage.googleapis.com/v0/b/connectionsmine.appspot.com/o/image_photos%2Fimage%3A207044?alt=media&token=d65709b3-2ee6-4d52-a59b-e159baf659b1");
+        Story s3 = new Story(FirebaseAuth.getInstance().getUid(), "Sasuke Uchiha","https://firebasestorage.googleapis.com/v0/b/connectionsmine.appspot.com/o/image_photos%2F51267?alt=media&token=84ad3eaf-6ed8-4b74-8a85-3ae877f41bd5");
+        Story s4 = new Story(FirebaseAuth.getInstance().getUid(), "Hatake Kakashi","https://firebasestorage.googleapis.com/v0/b/connectionsmine.appspot.com/o/image_photos%2F84037?alt=media&token=5e210192-1f31-41e9-b822-7ab44e672a34");
+        Story s5 = new Story(FirebaseAuth.getInstance().getUid(), "Riyuzaki El","https://firebasestorage.googleapis.com/v0/b/connectionsmine.appspot.com/o/image_photos%2F196029?alt=media&token=d28a2906-e0cb-4932-b183-d837c0a4d38b");
+
+        Story s10 = new Story(FirebaseAuth.getInstance().getUid(), "Itachi Uchiha","https://firebasestorage.googleapis.com/v0/b/connectionsmine.appspot.com/o/image_photos%2Fimage%3A206953?alt=media&token=5fd0444c-b758-45af-98ba-f49586a94239");
+        Story s9 = new Story(FirebaseAuth.getInstance().getUid(), "Madara Uchiha","https://firebasestorage.googleapis.com/v0/b/connectionsmine.appspot.com/o/image_photos%2Fimage%3A207044?alt=media&token=d65709b3-2ee6-4d52-a59b-e159baf659b1");
+        Story s8 = new Story(FirebaseAuth.getInstance().getUid(), "Sasuke Uchiha","https://firebasestorage.googleapis.com/v0/b/connectionsmine.appspot.com/o/image_photos%2F51267?alt=media&token=84ad3eaf-6ed8-4b74-8a85-3ae877f41bd5");
+        Story s7 = new Story(FirebaseAuth.getInstance().getUid(), "Hatake Kakashi","https://firebasestorage.googleapis.com/v0/b/connectionsmine.appspot.com/o/image_photos%2F84037?alt=media&token=5e210192-1f31-41e9-b822-7ab44e672a34");
+        Story s6 = new Story(FirebaseAuth.getInstance().getUid(), "Riyuzaki El","https://firebasestorage.googleapis.com/v0/b/connectionsmine.appspot.com/o/image_photos%2F196029?alt=media&token=d28a2906-e0cb-4932-b183-d837c0a4d38b");
+
+
+        storyData.add(s1);
+        storyData.add(s2);
+        storyData.add(s3);
+        storyData.add(s4);
+        storyData.add(s5);
+        storyData.add(s6);
+        storyData.add(s7);
+        storyData.add(s8);
+        storyData.add(s9);
+        storyData.add(s10);
+
+        storyFragment.setVisibility(View.GONE);
+
+
+        // Swipe for story
+        OnSwipeListener onSwipeListenerUpDown = generateSwipeListenerForStory();
+        View view = findViewById(R.id.vStory);
+        gestureDetector = new GestureDetectorCompat(this, onSwipeListenerUpDown);
+        view.setOnTouchListener(this);
+
+        /*
+        // Swipe for camera And Profile
+        OnSwipeListener onSwipeListenerLeftRight = generateSwipeListenerForCamera();
+        View leftRight = findViewById(R.id.idLeftRightNav);
+        gestureDetectorCamera = new GestureDetectorCompat(this, onSwipeListenerLeftRight);
+        leftRight.setOnTouchListener(this);
+
+
+         */
+
+
+
+
+
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                setupStory();
+
+            }
+        }).start();
+
+
 
         inboxMenuItem.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -192,7 +305,98 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
             }
         });
 
-        attachDbReadListener();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                attachDbReadListener();
+
+            }
+        }).start();
+    }
+
+
+
+    private  OnSwipeListener generateSwipeListenerForStory() {
+
+        OnSwipeListener onSwipeListener = new OnSwipeListener() {
+
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+
+                // Grab two events located on the plane at e1=(x1, y1) and e2=(x2, y2)
+                // Let e1 be the initial event
+                // e2 can be located at 4 different positions, consider the following diagram
+                // (Assume that lines are separated by 90 degrees.)
+                //
+                //
+                //         \ A  /
+                //          \  /
+                //       D   e1   B
+                //          /  \
+                //         / C  \
+                //
+                // So if (x2,y2) falls in region:
+                //  A => it's an UP swipe
+                //  B => it's a RIGHT swipe
+                //  C => it's a DOWN swipe
+                //  D => it's a LEFT swipe
+                //
+
+                float x1 = e1.getX();
+                float y1 = e1.getY();
+
+                float x2 = e2.getX();
+                float y2 = e2.getY();
+
+                Direction direction = getDirection(x1,y1,x2,y2);
+                return onSwipe(direction);
+            }
+
+
+
+            @Override
+            public boolean onSwipe(Direction direction) {
+
+                // Possible implementation
+
+                if(direction == Direction.up ) {
+
+                    storyFragment.setVisibility(View.VISIBLE);
+                    startStoryFragmentAnimUp();
+                    return true;
+                }
+                else if(direction == OnSwipeListener.Direction.down){
+
+                    startStoryFragmentAnimDown();
+                    storyFragment.setVisibility(View.GONE);
+                    return true;
+
+                }
+
+               else if(direction == OnSwipeListener.Direction.left ) {
+
+                    Intent intent = new Intent(getApplicationContext(),UserProfileActivity.class);
+                    Bundle bndlAnimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.slide_left_anim, R.anim.slide_right_anim).toBundle();
+                    startActivity(intent, bndlAnimation);
+                    return true;
+                }
+
+                else if(direction == OnSwipeListener.Direction.right){
+                    Intent intent = new Intent(getApplicationContext(),CameraXNew.class);
+                    Bundle bndlAnimation = ActivityOptions.makeCustomAnimation(getApplicationContext(),R.anim.left_to_rigth_for_lr, R.anim.right_to_left_for_lr).toBundle();
+                    startActivity(intent, bndlAnimation);
+                    return true;
+
+                }
+
+
+                return super.onSwipe(direction);
+            }
+        };
+
+        return onSwipeListener;
+
     }
 
     String id;
@@ -201,6 +405,8 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
     int likes;
     String dp;
     String userName;
+
+
 
     private void attachDbReadListener() {
 
@@ -253,8 +459,11 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
         detachDbReadListener();
     }
 
-
-
+    @Override
+    protected void onStart() {
+        super.onStart();
+        attachDbReadListener();
+    }
 
     private void detachDbReadListener() {
 
@@ -302,7 +511,7 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
         int[] startingLocation = new int[2];
         v.getLocationOnScreen(startingLocation);
         startingLocation[0] += v.getWidth() / 2;
-        UserProfileActivity.startUserProfileFromLocation(startingLocation, this);
+      //  UserProfileActivity.startUserProfileFromLocation(startingLocation, this);
         overridePendingTransition(0, 0);
 
     }
@@ -342,4 +551,6 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
 
 
     }
+
+
 }

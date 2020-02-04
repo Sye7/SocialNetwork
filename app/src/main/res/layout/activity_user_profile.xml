@@ -12,9 +12,9 @@
     
     <androidx.appcompat.widget.Toolbar
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="45dp"
         android:id="@+id/toolbar"
-        app:navigationIcon="@mipmap/ic_menu_white"
+        app:navigationIcon="@drawable/search_user"
         android:background="?attr/colorPrimary"
         android:elevation="@dimen/default_elevation"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
@@ -24,11 +24,11 @@
     <TextView
         android:id="@+id/ivLogo"
         android:layout_width="wrap_content"
-        android:text="ConnectionsMine"
+        android:text="Tell Tale"
         android:gravity="center"
         android:textColor="#fff"
         android:fontFamily="@font/pacifico"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:scaleType="centerInside"
@@ -287,19 +287,5 @@
 -->
 
 
-
-    <ImageButton
-        android:id="@+id/btnCreate"
-        android:layout_width="@dimen/btn_fab_size"
-        android:layout_height="@dimen/btn_fab_size"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="@dimen/btn_fab_margins"
-        android:layout_marginBottom="@dimen/btn_fab_margins"
-
-        android:background="@drawable/btn_fab_default"
-        android:elevation="@dimen/default_elevation"
-        android:src="@mipmap/ic_instagram_white"
-        android:textSize="28sp" />
 
 </RelativeLayout>

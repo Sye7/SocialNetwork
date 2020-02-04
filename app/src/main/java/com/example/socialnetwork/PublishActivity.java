@@ -7,6 +7,7 @@ import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
@@ -163,6 +164,8 @@ public class PublishActivity extends AppCompatActivity {
 
         uploadImage(pictureBitmap);
 
+        btn_publish.startAnimation(AnimationUtils.loadAnimation(this, R.anim.slide_out_send));
+        btn_publish.setVisibility(View.GONE);
 
 
         // Save image locally

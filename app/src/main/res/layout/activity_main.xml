@@ -4,32 +4,55 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#E0E0E0"
     tools:context=".MainActivity">
+
 
     <include
         android:id="@+id/toolbar"
         layout="@layout/view_feed_toolbar" />
+
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/rvFeed"
         android:layout_below="@+id/toolbar"
+        android:layout_above="@+id/rvStory"
         android:scrollbars="none"/>
 
-    <ImageButton
-        android:id="@+id/btnCreate"
-        android:layout_width="@dimen/btn_fab_size"
-        android:layout_height="@dimen/btn_fab_size"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginBottom="@dimen/btn_fab_margins"
-        android:layout_marginEnd="@dimen/btn_fab_margins"
-        android:onClick="openCamera"
 
-        android:background="@drawable/btn_fab_default"
-        android:elevation="@dimen/default_elevation"
-        android:src="@mipmap/ic_instagram_white"
-        android:textSize = "28sp"/>
+    <fragment
+        android:id="@+id/storyViewModeFragment"
+        android:name="com.example.socialnetwork.fragment.StoryViewMode"
+        android:layout_width="match_parent"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_below="@+id/toolbar"
+        android:layout_marginTop="25dp"
+        android:layout_marginBottom="15dp"
+        android:layout_above="@+id/rvStory"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        />
+
+    <View
+       android:layout_width="wrap_content"
+       android:layout_height="80dp"
+       android:id="@+id/vStory"
+       android:layout_above="@+id/rvStory"
+       >
+
+   </View>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvStory"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom"
+        android:background="?attr/colorPrimary"
+        android:scrollbars="none" />
+
 
 </RelativeLayout>

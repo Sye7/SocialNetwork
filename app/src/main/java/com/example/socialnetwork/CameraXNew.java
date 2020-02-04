@@ -2,6 +2,7 @@ package com.example.socialnetwork;
 
 
 import android.annotation.SuppressLint;
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -12,6 +13,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Rational;
 import android.util.Size;
+import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
@@ -32,12 +34,15 @@ import androidx.camera.core.PreviewConfig;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.GestureDetectorCompat;
 import androidx.lifecycle.LifecycleOwner;
+
+import com.example.socialnetwork.swipe_listener.OnSwipeListener;
 
 import java.io.File;
 import java.io.IOException;
 
-public class CameraXNew extends AppCompatActivity {
+public class CameraXNew extends AppCompatActivity implements  View.OnTouchListener {
 
     private int REQUEST_CODE_PERMISSIONS = 101;
     private String[] REQUIRED_PERMISSIONS = new String[]{"android.permission.CAMERA",
@@ -82,11 +87,77 @@ public class CameraXNew extends AppCompatActivity {
         intent.putExtra(Intent.EXTRA_LOCAL_ONLY,true);
         startActivityForResult(Intent.createChooser(intent,"Complete Action Using"),RC_PHOTO_PICKER);
 
+    }
 
 
+
+    private OnSwipeListener generateSwipeListenerForStory() {
+
+        OnSwipeListener onSwipeListener = new OnSwipeListener() {
+
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+
+                // Grab two events located on the plane at e1=(x1, y1) and e2=(x2, y2)
+                // Let e1 be the initial event
+                // e2 can be located at 4 different positions, consider the following diagram
+                // (Assume that lines are separated by 90 degrees.)
+                //
+                //
+                //         \ A  /
+                //          \  /
+                //       D   e1   B
+                //          /  \
+                //         / C  \
+                //
+                // So if (x2,y2) falls in region:
+                //  A => it's an UP swipe
+                //  B => it's a RIGHT swipe
+                //  C => it's a DOWN swipe
+                //  D => it's a LEFT swipe
+                //
+
+                float x1 = e1.getX();
+                float y1 = e1.getY();
+
+                float x2 = e2.getX();
+                float y2 = e2.getY();
+
+                Direction direction = getDirection(x1,y1,x2,y2);
+                return onSwipe(direction);
+            }
+
+
+
+            @Override
+            public boolean onSwipe(Direction direction) {
+
+                // Possible implementation
+
+
+                 if(direction == OnSwipeListener.Direction.left ) {
+
+                    Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                    Bundle bndlAnimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.slide_left_anim, R.anim.slide_right_anim).toBundle();
+                    startActivity(intent, bndlAnimation);
+                    finish();
+                    return true;
+                }
+
+
+
+
+                return super.onSwipe(direction);
+            }
+        };
+
+        return onSwipeListener;
 
     }
 
+
+
+    GestureDetectorCompat  gestureDetector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +170,12 @@ public class CameraXNew extends AppCompatActivity {
 
         textureView = findViewById(R.id.view_finder);
         layout = findViewById(R.id.cameraBg);
+
+        OnSwipeListener onSwipeListenerUpDown = generateSwipeListenerForStory();
+        gestureDetector = new GestureDetectorCompat(this, onSwipeListenerUpDown);
+        layout.setOnTouchListener(this);
+
+
         layout.setOnClickListener(new DoubleClickListener() {
             @Override
             public void onSingleClick(View v) {
@@ -261,6 +338,12 @@ public class CameraXNew extends AppCompatActivity {
                 return false;
             }
         }
+        return true;
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        gestureDetector.onTouchEvent(event);
         return true;
     }
 }

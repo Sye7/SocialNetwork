@@ -23,6 +23,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
+import java.util.HashSet;
 import java.util.List;
 
 
@@ -30,7 +31,7 @@ public class ChatsFragment extends Fragment {
 
     public RecyclerView recyclerView;
     public UserAdapter userAdapter;
-    public List<Profile> mUsers;
+    public HashSet<Profile> mUsers;
 
     FirebaseUser firebaseUser;
     DatabaseReference reference;
@@ -84,7 +85,7 @@ public class ChatsFragment extends Fragment {
     }
 
     public void readChats() {
-        mUsers = new ArrayList<>();
+        mUsers = new HashSet<>();
         reference = FirebaseDatabase.getInstance().getReference().child("Profile");
         reference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -111,7 +112,7 @@ public class ChatsFragment extends Fragment {
 
                 }
 
-                userAdapter = new UserAdapter(getContext(),mUsers);
+                userAdapter = new UserAdapter(getContext(),new ArrayList<Profile>(mUsers));
                 recyclerView.setAdapter(userAdapter);
             }
 

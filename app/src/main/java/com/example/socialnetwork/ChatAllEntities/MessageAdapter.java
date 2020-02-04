@@ -2,7 +2,6 @@ package com.example.socialnetwork.ChatAllEntities;
 
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,8 +44,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+
         if(viewType == MSG_TYPE_RIGHT) {
-            View view = LayoutInflater.from(mContext).inflate(R.layout.chat_item_left, viewGroup, false);
+            View view = LayoutInflater.from(mContext).inflate(R.layout.chat_item_right, viewGroup, false);
             return new MessageAdapter.ViewHolder(view);
         }
         else {
@@ -115,6 +115,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     @Override
     public int getItemViewType(int position) {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
         if(mChat.get(position).getSender().equals(firebaseUser.getUid())){
             return MSG_TYPE_RIGHT;
         }
