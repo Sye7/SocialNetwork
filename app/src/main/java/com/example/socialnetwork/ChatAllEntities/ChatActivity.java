@@ -135,7 +135,7 @@ public class ChatActivity extends AppCompatActivity {
         ViewPagerAdapter viewPagerAdapter  = new ViewPagerAdapter(getSupportFragmentManager());
 
         viewPagerAdapter.addFragment(new ChatsFragment(),"Chats");
-        viewPagerAdapter.addFragment(new UsersFragment(),"People");
+        viewPagerAdapter.addFragment(new UsersFragment(),"All Users");
 
 
         viewPager.setAdapter(viewPagerAdapter);

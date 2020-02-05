@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     app:navigationIcon="@drawable/search_user"
     android:layout_height="45dp"
-    android:background="?attr/colorPrimary"
+    android:background="@color/style_color_primary"
     android:elevation="@dimen/default_elevation"
     app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 

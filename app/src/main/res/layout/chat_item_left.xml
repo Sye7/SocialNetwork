@@ -3,17 +3,20 @@
     android:layout_width="300dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="8dp"
+    android:background="@drawable/chat_receiver_large_tv"
     android:layout_height="wrap_content">
 
     <androidx.cardview.widget.CardView
         android:layout_width="wrap_content"
-        app:cardCornerRadius="20dp"
+        app:cardCornerRadius="25dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="5dp"
         android:id="@+id/cdiv"
         android:layout_height="wrap_content">
 
         <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:src="@drawable/app_icon"
             android:id="@+id/profile_image"
             />
@@ -22,17 +25,12 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/cdiv"
-        android:layout_toEndOf="@id/cdiv"
-        android:layout_marginStart="10dp"
-        android:layout_marginLeft="10dp"
-        android:text="Hello"
+        android:text="Hey!  "
         android:id="@+id/show_message"
         android:textSize="18sp"
-
-        android:padding="8dp"
-
-        android:background="@drawable/background"
+        android:layout_toEndOf="@+id/cdiv"
+        android:layout_marginTop="28dp"
+        android:layout_marginStart="25dp"
         />
 
 </RelativeLayout>

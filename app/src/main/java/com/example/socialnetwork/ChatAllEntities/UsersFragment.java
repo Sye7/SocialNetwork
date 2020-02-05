@@ -58,7 +58,6 @@ public class UsersFragment extends Fragment {
                 System.out.println("yas2");
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    System.out.println("yas3");
 
                     Profile user = snapshot.getValue(Profile.class);
 
@@ -69,7 +68,6 @@ public class UsersFragment extends Fragment {
                 }
                 userAdapter = new UserAdapter(getContext(), mUsers);
                 recyclerView.setAdapter(userAdapter);
-                System.out.println("yas4");
 
             }
 

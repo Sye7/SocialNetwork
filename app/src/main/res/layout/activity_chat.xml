@@ -13,7 +13,7 @@
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar_chat"
-            android:background="@drawable/background"
+            android:background="@color/style_color_primary_dark"
             android:layout_width="match_parent"
             android:layout_height="80dp"
             android:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar"
@@ -50,10 +50,10 @@
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@drawable/background"
+        android:background="@color/style_color_primary"
         app:tabSelectedTextColor="#fff"
-        app:tabIndicatorColor="@color/colorPrimary"
-        app:tabTextColor="@color/colorPrimaryDark"
+        app:tabIndicatorColor="#000"
+        app:tabTextColor="#000"
 
         />
 

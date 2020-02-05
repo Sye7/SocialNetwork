@@ -144,6 +144,11 @@ public class CameraXNew extends AppCompatActivity implements  View.OnTouchListen
                     return true;
                 }
 
+               else if(direction == OnSwipeListener.Direction.up ) {
+                     switchCamera();
+                    return true;
+                }
+
 
 
 
@@ -176,17 +181,6 @@ public class CameraXNew extends AppCompatActivity implements  View.OnTouchListen
         layout.setOnTouchListener(this);
 
 
-        layout.setOnClickListener(new DoubleClickListener() {
-            @Override
-            public void onSingleClick(View v) {
-
-            }
-
-            @Override
-            public void onDoubleClick(View v) {
-                switchCamera();
-            }
-        });
 
         if(allPermissionGranted()){
 
