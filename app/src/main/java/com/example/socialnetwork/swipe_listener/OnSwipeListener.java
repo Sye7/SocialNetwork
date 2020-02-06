@@ -2,8 +2,9 @@ package com.example.socialnetwork.swipe_listener;
 
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.View;
 
-public class OnSwipeListener extends GestureDetector.SimpleOnGestureListener {
+public class OnSwipeListener extends GestureDetector.SimpleOnGestureListener implements View.OnTouchListener {
 
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
@@ -72,6 +73,11 @@ public class OnSwipeListener extends GestureDetector.SimpleOnGestureListener {
 
         double rad = Math.atan2(y1-y2,x2-x1) + Math.PI;
         return (rad*180/Math.PI + 180)%360;
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        return false;
     }
 
 

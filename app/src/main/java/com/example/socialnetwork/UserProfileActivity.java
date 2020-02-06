@@ -52,11 +52,10 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 
-
 // Circular Reveal
 
 public class UserProfileActivity extends AppCompatActivity implements RevealBackgroundView.OnStateChangeListener,
-        View.OnTouchListener  {
+        View.OnTouchListener {
     public static final String ARG_REVEAL_START_LOCATION = "reveal_start_location";
 
     private static final int USER_OPTIONS_ANIMATION_DELAY = 300;
@@ -71,7 +70,7 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
     RevealBackgroundView vRevealBackground;
 
     RecyclerView rvUserProfile;
-   // private ActivityMainBinding binding;;
+    // private ActivityMainBinding binding;;
 
 
     ImageView ivUserProfilePhoto;
@@ -84,18 +83,14 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
     TextView tvOccupation;
 
 
-
-
     private int avatarSize;
     private String profilePhoto;
     private UserProfileAdapter userPhotosAdapter;
 
-    public  void showStory(View view){
+    public void showStory(View view) {
 
         startActivity(new Intent(getApplicationContext(), StoryStatus.class));
     }
-
-
 
 
     public static void startUserProfileFromLocation(int[] startingLocation, Activity startingActivity) {
@@ -105,19 +100,15 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
     }
 
 
-
-
-
-
-    public void EditDp(View view)
-    {
+    public void EditDp(View view) {
         // TODO: Fire an intent to show an image picker
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/jpeg");
-        intent.putExtra(Intent.EXTRA_LOCAL_ONLY,true);
-        startActivityForResult(Intent.createChooser(intent,"Complete Action Using"),RC_PHOTO_PICKER);
+        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+        startActivityForResult(Intent.createChooser(intent, "Complete Action Using"), RC_PHOTO_PICKER);
 
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 
@@ -132,16 +123,14 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
 
     }
 
-     Profile updateProfile = new Profile();
+    Profile updateProfile = new Profile();
 
-    public void setting(View view)
-    {
+    public void setting(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Edit Profile");
         View viewInflated = LayoutInflater.from(this).inflate(R.layout.edit_profile_dialog, (ViewGroup) findViewById(android.R.id.content), false);
         final EditText userName = (EditText) viewInflated.findViewById(R.id.et_username);
         final EditText interest = (EditText) viewInflated.findViewById(R.id.et_interest);
-
 
 
         builder.setView(viewInflated);
@@ -153,11 +142,11 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
                 final DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Profile");
 
 
-                    //uploadImage();
+                //uploadImage();
 
 
-              //  /Get a reference to store file at image_photos/<FileName>
-                if(selectedImageUri !=null) {
+                //  /Get a reference to store file at image_photos/<FileName>
+                if (selectedImageUri != null) {
 
                     final StorageReference photoRef = mChatPhotoStorageRef.child(selectedImageUri.getLastPathSegment());
 
@@ -244,8 +233,7 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
                                 public void onFailure(@NonNull Exception e) {
                                 }
                             });
-                }
-                else{
+                } else {
                     Query query = ref.orderByChild("id").equalTo(FirebaseAuth.getInstance().getUid());
 
                     query.addValueEventListener(new ValueEventListener() {
@@ -301,12 +289,7 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
                     });
 
 
-
                 }
-
-
-
-
 
 
             }
@@ -321,7 +304,7 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
         builder.show();
     }
 
-    public void updatedDp(){
+    public void updatedDp() {
 
         Picasso.get()
                 .load(profilePhoto)
@@ -337,6 +320,7 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
         gestureDetector.onTouchEvent(event);
         return true;
     }
+
     GestureDetectorCompat gestureDetector;
 
 
@@ -352,13 +336,14 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
         vRevealBackground = (RevealBackgroundView) findViewById(R.id.vRevealBackground);
         rvUserProfile = findViewById(R.id.rvUserProfile);
         ivUserProfilePhoto = findViewById(R.id.ivUserProfilePhoto);
-        vUserDetails  = findViewById(R.id.vUserDetails);
+        vUserDetails = findViewById(R.id.vUserDetails);
         btnFollow = findViewById(R.id.btnFollow);
         vUserStats = findViewById(R.id.vUserStats);
         vUserProfileRoot = findViewById(R.id.vUserProfileRoot);
         tvUserName = findViewById(R.id.tvUserName);
         tvInstaUserName = findViewById(R.id.tv_insta_UserName);
         tvOccupation = findViewById(R.id.tvOccupation);
+
 
 
         mFirebaseStorage = FirebaseStorage.getInstance();
@@ -368,6 +353,7 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
         gestureDetector = new GestureDetectorCompat(this, onSwipeListenerUpDown);
         rvUserProfile.setOnTouchListener(this);
 
+
         setupUserProfileGrid();
         setupRevealBackground(savedInstanceState);
         getData();
@@ -375,7 +361,7 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
     }
 
 
-    private  OnSwipeListener generateSwipeListenerForStory() {
+    private OnSwipeListener generateSwipeListenerForStory() {
 
         OnSwipeListener onSwipeListener = new OnSwipeListener() {
 
@@ -407,10 +393,9 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
                 float x2 = e2.getX();
                 float y2 = e2.getY();
 
-                Direction direction = getDirection(x1,y1,x2,y2);
+                Direction direction = getDirection(x1, y1, x2, y2);
                 return onSwipe(direction);
             }
-
 
 
             @Override
@@ -419,25 +404,23 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
                 // Possible implementation
 
 
-                 if(direction == OnSwipeListener.Direction.right){
-                    Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-                    Bundle bndlAnimation = ActivityOptions.makeCustomAnimation(getApplicationContext(),R.anim.left_to_rigth_for_lr, R.anim.right_to_left_for_lr).toBundle();
+                if (direction == OnSwipeListener.Direction.right) {
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    Bundle bndlAnimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.left_to_rigth_for_lr, R.anim.right_to_left_for_lr).toBundle();
                     startActivity(intent, bndlAnimation);
                     finish();
                     return true;
-
                 }
 
 
                 return super.onSwipe(direction);
+
             }
         };
 
         return onSwipeListener;
 
     }
-
-
 
 
     private void setupRevealBackground(Bundle savedInstanceState) {
@@ -467,7 +450,6 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
     }
 
 
-
     private void setupUserProfileGrid() {
 
         final StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
@@ -485,18 +467,17 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
     public void onStateChange(int state) {
         if (RevealBackgroundView.STATE_FINISHED == state) {
             rvUserProfile.setVisibility(View.VISIBLE);
-          //  tlUserProfileTabs.setVisibility(View.VISIBLE);
+            //  tlUserProfileTabs.setVisibility(View.VISIBLE);
             vUserProfileRoot.setVisibility(View.VISIBLE);
             userPhotosAdapter = new UserProfileAdapter(this);
             rvUserProfile.setAdapter(userPhotosAdapter);
             animateUserProfileHeader();
         } else {
-          //  tlUserProfileTabs.setVisibility(View.INVISIBLE);
+            //  tlUserProfileTabs.setVisibility(View.INVISIBLE);
             rvUserProfile.setVisibility(View.INVISIBLE);
             vUserProfileRoot.setVisibility(View.INVISIBLE);
         }
     }
-
 
 
     private void animateUserProfileHeader() {
@@ -518,7 +499,6 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
         DatabaseReference profileRef = FirebaseDatabase.getInstance().getReference("Profile");
 
 
-
         Query query = userRef.orderByChild("id").equalTo(firebaseUser.getUid());
 
         query.addValueEventListener(new ValueEventListener() {
@@ -535,13 +515,12 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
 
                         // If already present
                         String name = userLoginModel.getName();
-                       tvUserName.setText(name);
+                        tvUserName.setText(name);
 
 
                     }
 
                 }
-
 
 
             }
@@ -552,7 +531,7 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
             }
         });
 
-         query = profileRef.orderByChild("id").equalTo(firebaseUser.getUid());
+        query = profileRef.orderByChild("id").equalTo(firebaseUser.getUid());
 
         query.addValueEventListener(new ValueEventListener() {
             @Override
@@ -568,7 +547,7 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
 
                         // If already present
                         String name = profile.getUserName();
-                        String occupation =  profile.getOccupation();
+                        String occupation = profile.getOccupation();
                         profilePhoto = profile.getDp();
                         tvInstaUserName.setText(name);
                         tvOccupation.setText(occupation);
@@ -579,7 +558,6 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
 
 
                 }
-
 
 
             }

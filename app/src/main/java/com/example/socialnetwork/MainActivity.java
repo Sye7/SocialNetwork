@@ -49,12 +49,10 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
     List<Post> postList;
     private DatabaseReference mMessageDatabaseReference;
     private ChildEventListener childEventListener;
-   public static String storyId = "";
+    public static String storyId = "";
     boolean backPressToExit = false;
     // Up down gestures
-    GestureDetectorCompat  gestureDetector;
-
-
+    GestureDetectorCompat gestureDetector;
 
 
     @Override
@@ -69,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
             startActivity(a);
         }
 
-        Snackbar.make(ivLogo,"Back Again to Exit",Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(ivLogo, "Back Again to Exit", Snackbar.LENGTH_SHORT).show();
 
         this.backPressToExit = true;
         new Handler().postDelayed(new Runnable() {
@@ -82,7 +80,6 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
 
 
     }
-
 
 
     // Must use for recycle view
@@ -108,8 +105,7 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
 
     }
 
-    private void setupStory()
-    {
+    private void setupStory() {
         storyLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
 
         storyRecyclerView.setLayoutManager(storyLayoutManager);
@@ -181,13 +177,12 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
         storyFragment.startAnimation(animate);
     }
 
-    private void startStoryFragmentAnimDown()
-    {
+    private void startStoryFragmentAnimDown() {
         TranslateAnimation animate = new TranslateAnimation(
                 0,                 // fromXDelta
                 0,                 // toXDelta
                 0,                 // fromYDelta
-                storyFragment.getHeight()+500); // toYDelta
+                storyFragment.getHeight() + 500); // toYDelta
         animate.setDuration(500);
         storyFragment.startAnimation(animate);
 
@@ -215,17 +210,17 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
         storyRecyclerView.setHasFixedSize(true);
         storyData = new ArrayList<>();
 
-        Story s1 = new Story(FirebaseAuth.getInstance().getUid(), "Itachi Uchiha","https://firebasestorage.googleapis.com/v0/b/connectionsmine.appspot.com/o/image_photos%2Fimage%3A206953?alt=media&token=5fd0444c-b758-45af-98ba-f49586a94239");
-        Story s2 = new Story(FirebaseAuth.getInstance().getUid(), "Madara Uchiha","https://firebasestorage.googleapis.com/v0/b/connectionsmine.appspot.com/o/image_photos%2Fimage%3A207044?alt=media&token=d65709b3-2ee6-4d52-a59b-e159baf659b1");
-        Story s3 = new Story(FirebaseAuth.getInstance().getUid(), "Sasuke Uchiha","https://firebasestorage.googleapis.com/v0/b/connectionsmine.appspot.com/o/image_photos%2F51267?alt=media&token=84ad3eaf-6ed8-4b74-8a85-3ae877f41bd5");
-        Story s4 = new Story(FirebaseAuth.getInstance().getUid(), "Hatake Kakashi","https://firebasestorage.googleapis.com/v0/b/connectionsmine.appspot.com/o/image_photos%2F84037?alt=media&token=5e210192-1f31-41e9-b822-7ab44e672a34");
-        Story s5 = new Story(FirebaseAuth.getInstance().getUid(), "Riyuzaki El","https://firebasestorage.googleapis.com/v0/b/connectionsmine.appspot.com/o/image_photos%2F196029?alt=media&token=d28a2906-e0cb-4932-b183-d837c0a4d38b");
+        Story s1 = new Story(FirebaseAuth.getInstance().getUid(), "Itachi Uchiha", "https://firebasestorage.googleapis.com/v0/b/connectionsmine.appspot.com/o/image_photos%2Fimage%3A206953?alt=media&token=5fd0444c-b758-45af-98ba-f49586a94239");
+        Story s2 = new Story(FirebaseAuth.getInstance().getUid(), "Madara Uchiha", "https://firebasestorage.googleapis.com/v0/b/connectionsmine.appspot.com/o/image_photos%2Fimage%3A207044?alt=media&token=d65709b3-2ee6-4d52-a59b-e159baf659b1");
+        Story s3 = new Story(FirebaseAuth.getInstance().getUid(), "Sasuke Uchiha", "https://firebasestorage.googleapis.com/v0/b/connectionsmine.appspot.com/o/image_photos%2F51267?alt=media&token=84ad3eaf-6ed8-4b74-8a85-3ae877f41bd5");
+        Story s4 = new Story(FirebaseAuth.getInstance().getUid(), "Hatake Kakashi", "https://firebasestorage.googleapis.com/v0/b/connectionsmine.appspot.com/o/image_photos%2F84037?alt=media&token=5e210192-1f31-41e9-b822-7ab44e672a34");
+        Story s5 = new Story(FirebaseAuth.getInstance().getUid(), "Riyuzaki El", "https://firebasestorage.googleapis.com/v0/b/connectionsmine.appspot.com/o/image_photos%2F196029?alt=media&token=d28a2906-e0cb-4932-b183-d837c0a4d38b");
 
-        Story s10 = new Story(FirebaseAuth.getInstance().getUid(), "Itachi Uchiha","https://firebasestorage.googleapis.com/v0/b/connectionsmine.appspot.com/o/image_photos%2Fimage%3A206953?alt=media&token=5fd0444c-b758-45af-98ba-f49586a94239");
-        Story s9 = new Story(FirebaseAuth.getInstance().getUid(), "Madara Uchiha","https://firebasestorage.googleapis.com/v0/b/connectionsmine.appspot.com/o/image_photos%2Fimage%3A207044?alt=media&token=d65709b3-2ee6-4d52-a59b-e159baf659b1");
-        Story s8 = new Story(FirebaseAuth.getInstance().getUid(), "Sasuke Uchiha","https://firebasestorage.googleapis.com/v0/b/connectionsmine.appspot.com/o/image_photos%2F51267?alt=media&token=84ad3eaf-6ed8-4b74-8a85-3ae877f41bd5");
-        Story s7 = new Story(FirebaseAuth.getInstance().getUid(), "Hatake Kakashi","https://firebasestorage.googleapis.com/v0/b/connectionsmine.appspot.com/o/image_photos%2F84037?alt=media&token=5e210192-1f31-41e9-b822-7ab44e672a34");
-        Story s6 = new Story(FirebaseAuth.getInstance().getUid(), "Riyuzaki El","https://firebasestorage.googleapis.com/v0/b/connectionsmine.appspot.com/o/image_photos%2F196029?alt=media&token=d28a2906-e0cb-4932-b183-d837c0a4d38b");
+        Story s10 = new Story(FirebaseAuth.getInstance().getUid(), "Itachi Uchiha", "https://firebasestorage.googleapis.com/v0/b/connectionsmine.appspot.com/o/image_photos%2Fimage%3A206953?alt=media&token=5fd0444c-b758-45af-98ba-f49586a94239");
+        Story s9 = new Story(FirebaseAuth.getInstance().getUid(), "Madara Uchiha", "https://firebasestorage.googleapis.com/v0/b/connectionsmine.appspot.com/o/image_photos%2Fimage%3A207044?alt=media&token=d65709b3-2ee6-4d52-a59b-e159baf659b1");
+        Story s8 = new Story(FirebaseAuth.getInstance().getUid(), "Sasuke Uchiha", "https://firebasestorage.googleapis.com/v0/b/connectionsmine.appspot.com/o/image_photos%2F51267?alt=media&token=84ad3eaf-6ed8-4b74-8a85-3ae877f41bd5");
+        Story s7 = new Story(FirebaseAuth.getInstance().getUid(), "Hatake Kakashi", "https://firebasestorage.googleapis.com/v0/b/connectionsmine.appspot.com/o/image_photos%2F84037?alt=media&token=5e210192-1f31-41e9-b822-7ab44e672a34");
+        Story s6 = new Story(FirebaseAuth.getInstance().getUid(), "Riyuzaki El", "https://firebasestorage.googleapis.com/v0/b/connectionsmine.appspot.com/o/image_photos%2F196029?alt=media&token=d28a2906-e0cb-4932-b183-d837c0a4d38b");
 
 
         storyData.add(s1);
@@ -259,10 +254,6 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
          */
 
 
-
-
-
-
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -271,7 +262,6 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
 
             }
         }).start();
-
 
 
         inboxMenuItem.setOnClickListener(new View.OnClickListener() {
@@ -316,8 +306,7 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
     }
 
 
-
-    private  OnSwipeListener generateSwipeListenerForStory() {
+    private OnSwipeListener generateSwipeListenerForStory() {
 
         OnSwipeListener onSwipeListener = new OnSwipeListener() {
 
@@ -349,10 +338,9 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
                 float x2 = e2.getX();
                 float y2 = e2.getY();
 
-                Direction direction = getDirection(x1,y1,x2,y2);
+                Direction direction = getDirection(x1, y1, x2, y2);
                 return onSwipe(direction);
             }
-
 
 
             @Override
@@ -360,31 +348,26 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
 
                 // Possible implementation
 
-                if(direction == Direction.up ) {
+                if (direction == Direction.up) {
 
                     storyFragment.setVisibility(View.VISIBLE);
                     startStoryFragmentAnimUp();
                     return true;
-                }
-                else if(direction == OnSwipeListener.Direction.down){
+                } else if (direction == OnSwipeListener.Direction.down) {
 
                     startStoryFragmentAnimDown();
                     storyFragment.setVisibility(View.GONE);
                     return true;
 
-                }
+                } else if (direction == OnSwipeListener.Direction.left) {
 
-               else if(direction == OnSwipeListener.Direction.left ) {
-
-                    Intent intent = new Intent(getApplicationContext(),UserProfileActivity.class);
+                    Intent intent = new Intent(getApplicationContext(), UserProfileActivity.class);
                     Bundle bndlAnimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.slide_left_anim, R.anim.slide_right_anim).toBundle();
                     startActivity(intent, bndlAnimation);
                     return true;
-                }
-
-                else if(direction == OnSwipeListener.Direction.right){
-                    Intent intent = new Intent(getApplicationContext(),CameraXNew.class);
-                    Bundle bndlAnimation = ActivityOptions.makeCustomAnimation(getApplicationContext(),R.anim.left_to_rigth_for_lr, R.anim.right_to_left_for_lr).toBundle();
+                } else if (direction == OnSwipeListener.Direction.right) {
+                    Intent intent = new Intent(getApplicationContext(), CameraXNew.class);
+                    Bundle bndlAnimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.left_to_rigth_for_lr, R.anim.right_to_left_for_lr).toBundle();
                     startActivity(intent, bndlAnimation);
                     return true;
 
@@ -407,7 +390,6 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
     String userName;
 
 
-
     private void attachDbReadListener() {
 
         if (childEventListener == null) {
@@ -424,7 +406,7 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
                     dp = p.getDp();
                     userName = p.getUserName();
 
-                    postList.add(new Post(id,photo,caption,likes,dp,userName));
+                    postList.add(new Post(id, photo, caption, likes, dp, userName));
 
                     feedAdapter.notifyDataSetChanged();
 
@@ -460,9 +442,11 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onResume() {
+        super.onResume();
         attachDbReadListener();
+        postList.clear();
+        feedAdapter.notifyDataSetChanged();
     }
 
     private void detachDbReadListener() {
@@ -472,8 +456,6 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
             childEventListener = null;
         }
     }
-
-
 
 
     // comment feed
@@ -511,7 +493,7 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
         int[] startingLocation = new int[2];
         v.getLocationOnScreen(startingLocation);
         startingLocation[0] += v.getWidth() / 2;
-      //  UserProfileActivity.startUserProfileFromLocation(startingLocation, this);
+        //  UserProfileActivity.startUserProfileFromLocation(startingLocation, this);
         overridePendingTransition(0, 0);
 
     }
@@ -544,9 +526,9 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
 
     public void openCamera(View v) {
 
-       // startActivity(new Intent(getApplicationContext(), UserProfileActivity.class ));
+        // startActivity(new Intent(getApplicationContext(), UserProfileActivity.class ));
 
-          startActivity(new Intent(getApplicationContext(), CameraXNew.class));
+        startActivity(new Intent(getApplicationContext(), CameraXNew.class));
         //  overridePendingTransition(0, 0);
 
 
