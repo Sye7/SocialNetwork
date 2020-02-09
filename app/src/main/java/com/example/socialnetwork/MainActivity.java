@@ -444,8 +444,9 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
     @Override
     protected void onResume() {
         super.onResume();
-        attachDbReadListener();
         postList.clear();
+
+        attachDbReadListener();
         feedAdapter.notifyDataSetChanged();
     }
 

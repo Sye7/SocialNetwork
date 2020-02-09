@@ -16,6 +16,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.socialnetwork.AnyTalk;
 import com.example.socialnetwork.R;
 import com.example.socialnetwork.model.Profile;
 import com.google.firebase.auth.FirebaseAuth;
@@ -49,6 +50,7 @@ public class MessageActivity extends AppCompatActivity {
     List<Chat> mChat;
 
     RecyclerView recyclerView;
+    ImageView profile_image_toolbar;
 
     Intent intent;
 
@@ -121,6 +123,44 @@ public class MessageActivity extends AppCompatActivity {
     }
 
 
+    String otherUserDp = "default";
+
+    public void getOtherUserDp(String userId) {
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Profile");
+        Query query = reference.orderByChild("id").equalTo(userId);
+
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Profile user = snapshot.getValue(Profile.class);
+
+
+                    if (user.getDp().equals("")) {
+                        otherUserDp = "default";
+
+                    } else {
+                        otherUserDp = user.getDp();
+                    }
+
+
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+
+
     String userId;
 
     @Override
@@ -155,6 +195,18 @@ public class MessageActivity extends AppCompatActivity {
         linearLayoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(linearLayoutManager);
 
+        recyclerView.setHasFixedSize(true);
+
+        profile_image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                startActivity(new Intent(getApplicationContext(), AnyTalk.class));
+                finish();
+
+            }
+        });
+
         btn_send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -168,30 +220,10 @@ public class MessageActivity extends AppCompatActivity {
             }
         });
 
-
+        getOtherUserDp(userId);
         databaseReference = FirebaseDatabase.getInstance().getReference("Users").child(userId);
         getData();
 
-        /*
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Users user = dataSnapshot.getValue(Users.class);
-                username.setText(user.getUsername());
-                if(user.getImageURL().equals("default")){
-                    profile_image.setImageResource(R.drawable.boy);
-                }
-                else
-                {
-                    Glide.with(MessageActivity.this).load(user.getImageURL()).into(profile_image);
-                }
-                readMessages(firebaseUser.getUid(),userId,user.getImageURL());
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });
-        */
 
     }
 
@@ -219,10 +251,11 @@ public class MessageActivity extends AppCompatActivity {
 
                     if (chat.getReceiver().equals(myid) && chat.getSender().equals(userid) ||
                             chat.getReceiver().equals(userid) && chat.getSender().equals(myid)) {
+
                         mChat.add(chat);
                     }
 
-                    messageAdapter = new MessageAdapter(MessageActivity.this, mChat, imageurl);
+                    messageAdapter = new MessageAdapter(MessageActivity.this, mChat, imageurl,otherUserDp);
                     recyclerView.setAdapter(messageAdapter);
                 }
             }
