@@ -46,27 +46,6 @@
     </androidx.appcompat.widget.Toolbar>
 
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvUserProfile"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
-
-        </RelativeLayout>
-
-
-    </ScrollView>
-
-
 
 
     <com.google.android.material.appbar.CollapsingToolbarLayout
@@ -78,7 +57,28 @@
                 app:contentScrim="?attr/colorPrimary"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
-                <LinearLayout
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_below="@id/vUserProfileRoot"
+                android:id="@+id/scRv"
+                android:layout_height="match_parent">
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvUserProfile"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            </ScrollView>
+
+
+
+
+            <LinearLayout
                     android:id="@+id/vUserProfileRoot"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -137,6 +137,7 @@
                             <Button
                                 android:id="@+id/btnFollow"
                                 android:layout_width="match_parent"
+                                android:onClick="startFollowUnfollow"
                                 android:layout_height="24dp"
                                 android:layout_marginTop="8dp"
                                 android:layout_marginRight="24dp"
@@ -166,7 +167,8 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="1167"
+                                android:text="0"
+                                android:id="@+id/tvPostCount"
                                 android:textColor="#ffffff"
                                 android:textSize="20sp" />
 
@@ -188,7 +190,8 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="396"
+                                android:text="0"
+                                android:id="@+id/tvFollowersCount"
                                 android:textColor="#ffffff"
                                 android:textSize="20sp" />
 
@@ -210,7 +213,8 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="485"
+                                android:text="0"
+                                android:id="@+id/tvFollowingCount"
                                 android:textColor="#ffffff"
                                 android:textSize="20sp" />
 
@@ -225,9 +229,14 @@
 
 
                 </LinearLayout>
+        </RelativeLayout>
 
 
-            </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+    </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+
+
 
 
 </RelativeLayout>

@@ -3,6 +3,7 @@ package com.example.socialnetwork;
 
 import android.app.Activity;
 import android.app.ActivityOptions;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -17,6 +18,7 @@ import android.view.animation.Interpolator;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +32,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.example.socialnetwork.CircularImage.CircleTransformation;
 import com.example.socialnetwork.adapter.UserProfileAdapter;
+import com.example.socialnetwork.model.Post;
 import com.example.socialnetwork.model.Profile;
 import com.example.socialnetwork.model.UserLoginModel;
 import com.example.socialnetwork.swipe_listener.OnSwipeListener;
@@ -51,6 +54,8 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+
 
 // Circular Reveal
 
@@ -70,6 +75,7 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
     RevealBackgroundView vRevealBackground;
 
     RecyclerView rvUserProfile;
+    ArrayList<String> photosPost;
     // private ActivityMainBinding binding;;
 
 
@@ -81,6 +87,10 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
     TextView tvUserName;
     TextView tvInstaUserName;
     TextView tvOccupation;
+
+    TextView postCount;
+    TextView followersCount;
+    TextView followingCount;
 
 
     private int avatarSize;
@@ -185,8 +195,17 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
                                                     // If already present
                                                     updateProfile.setId(profile.getId());
 
-                                                    updateProfile.setFollowers(profile.getFollowers());
-                                                    updateProfile.setFollowing(profile.getFollowing());
+                                                    if (profile.getFollowing() == null)
+                                                        updateProfile.setFollowing(null);
+                                                    else
+                                                        updateProfile.setFollowing(profile.getFollowing());
+
+                                                    if (profile.getFollowers() == null)
+                                                        updateProfile.setFollowers(null);
+                                                    else
+                                                        updateProfile.setFollowers(profile.getFollowers());
+
+
                                                     updateProfile.setPosts(profile.getPosts());
 
                                                     String name = userName.getText().toString();
@@ -323,6 +342,9 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
 
     GestureDetectorCompat gestureDetector;
 
+    Context ctx;
+    ScrollView scrv;
+    Profile currentUserModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -343,7 +365,24 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
         tvUserName = findViewById(R.id.tvUserName);
         tvInstaUserName = findViewById(R.id.tv_insta_UserName);
         tvOccupation = findViewById(R.id.tvOccupation);
+        ctx = this;
+        photosPost = new ArrayList<>();
 
+        postCount = findViewById(R.id.tvPostCount);
+        followersCount = findViewById(R.id.tvFollowersCount);
+        followingCount = findViewById(R.id.tvFollowingCount);
+
+        rvUserProfile.setVisibility(View.VISIBLE);
+        //  tlUserProfileTabs.setVisibility(View.VISIBLE);
+        vUserProfileRoot.setVisibility(View.VISIBLE);
+
+
+        userPhotosAdapter = new UserProfileAdapter(this, photosPost);
+        animateUserProfileHeader();
+        scrv = findViewById(R.id.scRv);
+
+
+        fillPhotoPostList();
 
 
         mFirebaseStorage = FirebaseStorage.getInstance();
@@ -351,12 +390,100 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
 
         OnSwipeListener onSwipeListenerUpDown = generateSwipeListenerForStory();
         gestureDetector = new GestureDetectorCompat(this, onSwipeListenerUpDown);
-        rvUserProfile.setOnTouchListener(this);
+        scrv.setOnTouchListener(this);
 
 
         setupUserProfileGrid();
         setupRevealBackground(savedInstanceState);
         getData();
+
+    }
+
+    public void startFollowUnfollow(View view) {
+
+
+
+        DatabaseReference otherUserProfile = FirebaseDatabase.getInstance().getReference("Profile");
+
+
+        Query query = otherUserProfile.orderByChild("userName").equalTo(tvInstaUserName.getText().toString());
+
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Profile profile = snapshot.getValue(Profile.class);
+
+                    if (profile.getUserName().equals(tvInstaUserName.getText().toString())) {
+
+                        // If already present
+                        DatabaseReference followingRef = FirebaseDatabase.getInstance().getReference("Followers").child(profile.getId());
+                        followingRef.push().setValue(currentUserModel);
+
+                        DatabaseReference otherUserProfile = FirebaseDatabase.getInstance().getReference("Following").child(currentUserModel.getId());
+                        otherUserProfile.push().setValue(profile);
+
+                    }
+
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    @Override
+    public void onBackPressed() {
+
+    }
+
+    public void fillPhotoPostList() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Post");
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        Query query = reference.orderByChild("id").equalTo(firebaseUser.getUid());
+
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Post post = snapshot.getValue(Post.class);
+
+
+                    if (post.getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+
+                        // If already present
+                        String photoUrl = post.getPhoto();
+                        photosPost.add(photoUrl);
+
+
+                        rvUserProfile.setVisibility(View.VISIBLE);
+                        //  tlUserProfileTabs.setVisibility(View.VISIBLE);
+                        vUserProfileRoot.setVisibility(View.VISIBLE);
+
+                        userPhotosAdapter.notifyDataSetChanged();
+                        postCount.setText(photosPost.size() + "");
+
+                    }
+
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
     }
 
@@ -427,7 +554,6 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
         vRevealBackground.setOnStateChangeListener(this);
         if (savedInstanceState == null) {
 
-            final int[] startingLocation = getIntent().getIntArrayExtra(ARG_REVEAL_START_LOCATION);
             vRevealBackground.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
                 @Override
                 public boolean onPreDraw() {
@@ -443,9 +569,6 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
                     return false;
                 }
             });
-        } else {
-            userPhotosAdapter.setLockedAnimations(true);
-            vRevealBackground.setToFinishedFrame();
         }
     }
 
@@ -469,7 +592,9 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
             rvUserProfile.setVisibility(View.VISIBLE);
             //  tlUserProfileTabs.setVisibility(View.VISIBLE);
             vUserProfileRoot.setVisibility(View.VISIBLE);
-            userPhotosAdapter = new UserProfileAdapter(this);
+
+
+            userPhotosAdapter = new UserProfileAdapter(this, photosPost);
             rvUserProfile.setAdapter(userPhotosAdapter);
             animateUserProfileHeader();
         } else {
@@ -494,9 +619,41 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
 
     public void getData() {
 
-        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("UserLoginModel");
         DatabaseReference profileRef = FirebaseDatabase.getInstance().getReference("Profile");
+        DatabaseReference followersRef = FirebaseDatabase.getInstance().getReference("Followers").child(FirebaseAuth.getInstance().getUid());
+        DatabaseReference followingRef = FirebaseDatabase.getInstance().getReference("Following").child(FirebaseAuth.getInstance().getUid());
+
+
+        followersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                followersCount.setText(dataSnapshot.getChildrenCount() + "");
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        followingRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                followingCount.setText(dataSnapshot.getChildrenCount() + "");
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
 
 
         Query query = userRef.orderByChild("id").equalTo(firebaseUser.getUid());
@@ -552,6 +709,8 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
                         tvInstaUserName.setText(name);
                         tvOccupation.setText(occupation);
                         updatedDp();
+
+                        currentUserModel = new Profile(firebaseUser.getUid(), name, occupation, profile.getPosts(), profile.getFollowers(), profile.getFollowing(), profilePhoto);
 
 
                     }

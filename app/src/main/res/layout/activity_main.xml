@@ -4,8 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
-
     android:background="#E0E0E0"
     tools:context=".MainActivity">
 
@@ -14,39 +12,38 @@
         android:id="@+id/toolbar"
         layout="@layout/view_feed_toolbar" />
 
-
-
-    <androidx.recyclerview.widget.RecyclerView
+    <ScrollView
+        android:id="@+id/vStory"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/rvFeed"
-        android:layout_below="@+id/toolbar"
-        android:layout_above="@+id/rvStory"
-        android:scrollbars="none"/>
+        android:layout_above="@id/rvStory"
+        android:layout_below="@id/toolbar">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvFeed"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/rvStory"
+            android:layout_below="@+id/toolbar"
+            android:scrollbars="none" />
+
+    </ScrollView>
 
 
     <fragment
         android:id="@+id/storyViewModeFragment"
         android:name="com.example.socialnetwork.fragment.StoryViewMode"
         android:layout_width="match_parent"
-        android:layout_marginStart="15dp"
-        android:layout_marginEnd="15dp"
-        android:layout_below="@+id/toolbar"
-        android:layout_marginTop="25dp"
-        android:layout_marginBottom="15dp"
-        android:layout_above="@+id/rvStory"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        />
+        android:layout_above="@+id/rvStory"
+        android:layout_below="@+id/toolbar"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="15dp"
+        android:layout_weight="1" />
 
-    <View
-       android:layout_width="wrap_content"
-       android:layout_height="80dp"
-       android:id="@+id/vStory"
-       android:layout_above="@+id/rvStory"
-       >
 
-   </View>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvStory"
         android:layout_width="match_parent"

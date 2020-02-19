@@ -105,13 +105,31 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
 
     }
 
+    boolean flag = true;
+
     private void setupStory() {
         storyLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
 
         storyRecyclerView.setLayoutManager(storyLayoutManager);
         storyRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        storyAdapter = new StoryAdapter(storyData, this);
+        storyAdapter = new StoryAdapter(storyData, this, new StoryAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Story story) {
+
+                if (flag) {
+                    storyFragment.setVisibility(View.VISIBLE);
+                    startStoryFragmentAnimUp();
+                    flag = false;
+                } else {
+                    startStoryFragmentAnimDown();
+                    storyFragment.setVisibility(View.GONE);
+                    flag = true;
+                }
+
+
+            }
+        });
         storyRecyclerView.setAdapter(storyAdapter);
 
     }
@@ -239,19 +257,9 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
 
         // Swipe for story
         OnSwipeListener onSwipeListenerUpDown = generateSwipeListenerForStory();
-        View view = findViewById(R.id.vStory);
         gestureDetector = new GestureDetectorCompat(this, onSwipeListenerUpDown);
-        view.setOnTouchListener(this);
+        rvFeed.setOnTouchListener(this);
 
-        /*
-        // Swipe for camera And Profile
-        OnSwipeListener onSwipeListenerLeftRight = generateSwipeListenerForCamera();
-        View leftRight = findViewById(R.id.idLeftRightNav);
-        gestureDetectorCamera = new GestureDetectorCompat(this, onSwipeListenerLeftRight);
-        leftRight.setOnTouchListener(this);
-
-
-         */
 
 
         new Thread(new Runnable() {
@@ -347,19 +355,14 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
             public boolean onSwipe(Direction direction) {
 
                 // Possible implementation
+                if (direction == OnSwipeListener.Direction.up) {
+                    return false;
+                }
+              else  if (direction == Direction.down) {
+                    return false;
+                }
 
-                if (direction == Direction.up) {
-
-                    storyFragment.setVisibility(View.VISIBLE);
-                    startStoryFragmentAnimUp();
-                    return true;
-                } else if (direction == OnSwipeListener.Direction.down) {
-
-                    startStoryFragmentAnimDown();
-                    storyFragment.setVisibility(View.GONE);
-                    return true;
-
-                } else if (direction == OnSwipeListener.Direction.left) {
+              else if (direction == OnSwipeListener.Direction.left) {
 
                     Intent intent = new Intent(getApplicationContext(), UserProfileActivity.class);
                     Bundle bndlAnimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.slide_left_anim, R.anim.slide_right_anim).toBundle();

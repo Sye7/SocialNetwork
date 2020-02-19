@@ -22,7 +22,7 @@ public class AnyTalk extends AppCompatActivity {
     /**
      * Called when the activity is first created.
      */
-    private static final String[] COUNTRIES = new String[]{"HINDI","URDU","ARABIC","MALAYALAM","TAMIL","TELUGU", "UK", "ITALY", "CHINA", "KOREA", "FRANCE", "JAPAN",};
+    private static final String[] COUNTRIES = new String[]{"HINDI", "URDU", "ARABIC", "MALAYALAM", "TAMIL", "TELUGU", "UK", "ITALY", "CHINA", "KOREA", "FRANCE", "JAPAN",};
 
     //Transalate
     String languagePair = "en-en";
@@ -33,46 +33,47 @@ public class AnyTalk extends AppCompatActivity {
     AutoCompleteTextView textView;
 
     Locale localeToUse = null;
+
     public void selectLang() {
         String lan = textView.getText().toString();
         switch (lan) {
 
             case "URDU":
                 languagePair = "en-ur";
-                localeToUse = new Locale("ur","SA");
+                localeToUse = new Locale("ur", "SA");
                 textToSpeechSystem.setLanguage(localeToUse);
                 break;
 
             case "TELUGU":
                 languagePair = "en-te";
-                localeToUse = new Locale("te","IN");
+                localeToUse = new Locale("te", "IN");
                 textToSpeechSystem.setLanguage(localeToUse);
                 break;
 
 
             case "TAMIL":
                 languagePair = "en-ta";
-                localeToUse = new Locale("ta","IN");
+                localeToUse = new Locale("ta", "IN");
                 textToSpeechSystem.setLanguage(localeToUse);
                 break;
 
 
             case "MALAYALAM":
                 languagePair = "en-ml";
-                localeToUse = new Locale("ml","IN");
+                localeToUse = new Locale("ml", "IN");
                 textToSpeechSystem.setLanguage(localeToUse);
                 break;
 
             case "ARABIC":
                 languagePair = "en-ar";
-                 localeToUse = new Locale("ar","EG");
+                localeToUse = new Locale("ar", "EG");
                 textToSpeechSystem.setLanguage(localeToUse);
                 break;
 
 
             case "HINDI":
                 languagePair = "en-hi";
-                 localeToUse = new Locale("hi","IN");
+                localeToUse = new Locale("hi", "IN");
                 textToSpeechSystem.setLanguage(localeToUse);
                 break;
 
@@ -138,12 +139,13 @@ public class AnyTalk extends AppCompatActivity {
         mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
         mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1);
 
+
         initailzeSpeechRecognizer();
 
 
         //Default variables for translation
 
-       //English to French ("<source_language>-<target_language>")
+        //English to French ("<source_language>-<target_language>")
         //Executing the translation function
 
 
@@ -161,11 +163,11 @@ public class AnyTalk extends AppCompatActivity {
         try {
             output = translatorBackgroundTask.execute(textToBeTranslated, languagePair).get();
             //Getting the characters between [ and ]
-            output = output.substring(output.indexOf('[')+1);
-            output = output.substring(0,output.indexOf("]"));
+            output = output.substring(output.indexOf('[') + 1);
+            output = output.substring(0, output.indexOf("]"));
             //Getting the characters between " and "
-            output = output.substring(output.indexOf("\"")+1);
-            output = output.substring(0,output.indexOf("\""));
+            output = output.substring(output.indexOf("\"") + 1);
+            output = output.substring(0, output.indexOf("\""));
             say(output);
 
 
@@ -227,6 +229,7 @@ public class AnyTalk extends AppCompatActivity {
 
             mySpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
             mySpeechRecognizer.setRecognitionListener(new RecognitionListener() {
+
                 @Override
                 public void onReadyForSpeech(Bundle params) {
 
@@ -250,6 +253,7 @@ public class AnyTalk extends AppCompatActivity {
                 @Override
                 public void onEndOfSpeech() {
 
+                    mySpeechRecognizer.startListening(mSpeechRecognizerIntent);
 
                 }
 

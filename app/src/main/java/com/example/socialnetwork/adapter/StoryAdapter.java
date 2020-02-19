@@ -11,23 +11,31 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.socialnetwork.MainActivity;
 import com.example.socialnetwork.R;
 import com.example.socialnetwork.model.Story;
 
 import java.util.List;
 
-public class StoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>  {
+public class StoryAdapter extends RecyclerView.Adapter  {
+
+    public interface OnItemClickListener {
+        void onItemClick(Story story);
+    }
+
+    private final OnItemClickListener listener;
 
 
     List<Story> storyList;
     private Context context;
 
 
-    public StoryAdapter(List<Story> storyList, Context context)
+
+
+    public StoryAdapter(List<Story> storyList, Context context, OnItemClickListener listener)
     {
         this.storyList = storyList;
         this.context = context;
+        this.listener = listener;
     }
 
     @NonNull
@@ -41,49 +49,11 @@ public class StoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
 
+
+
         final StoryAdapter.StoryFeedViewHolder holderStory = (StoryAdapter.StoryFeedViewHolder) holder;
 
-        final Story story = storyList.get(position);
-
-        holderStory.tvName.setText(story.getName());
-        Glide.with(context)
-                .load(story.getDp())
-                .placeholder(R.drawable.img_circle_placeholder)
-                .into(((StoryFeedViewHolder) holder).ivStoryPic);
-
-     /*   Picasso.get()
-                .load(story.getDp())
-                .placeholder(R.drawable.img_circle_placeholder)
-                .transform(new CircleTransformation())
-                .into(holderStory.ivStoryPic);
-
-
-      */
-
-        holderStory.ivStoryPic.setOnLongClickListener(new View.OnLongClickListener() {
-
-            @Override
-            public boolean onLongClick(View v) {
-
-               MainActivity.storyId = story.getId();
-
-                return false;
-            }
-
-
-        });
-
-       /* Picasso.get()
-                .load(story.getDp())
-                .placeholder(R.drawable.img_circle_placeholder)
-                .resize(80, 80)
-                .centerCrop()
-                .transform(new CircleTransformation())
-                .into(holderStory.ivStoryPic);
-
-
-        */
-
+        holderStory.bind(storyList.get(position), listener, context);
 
 
     }
@@ -93,11 +63,28 @@ public class StoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return storyList.size();
     }
 
-    public static class StoryFeedViewHolder extends RecyclerView.ViewHolder
+     static class StoryFeedViewHolder extends RecyclerView.ViewHolder
     {
 
         ImageView ivStoryPic;
         TextView tvName;
+
+        public void bind(final Story story, final OnItemClickListener listener, Context context) {
+
+
+            tvName.setText(story.getName());
+            Glide.with(context)
+                    .load(story.getDp())
+                    .placeholder(R.drawable.img_circle_placeholder)
+                    .into(ivStoryPic);
+
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View v) {
+                    listener.onItemClick(story);
+                }
+            });
+        }
 
 
         public StoryFeedViewHolder(@NonNull View itemView) {
@@ -106,5 +93,7 @@ public class StoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             ivStoryPic = itemView.findViewById(R.id.ivStoryContent);
             tvName = itemView.findViewById(R.id.tvStoryHolderName);
         }
+
+
     }
 }
