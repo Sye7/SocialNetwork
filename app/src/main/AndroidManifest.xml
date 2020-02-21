@@ -15,7 +15,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".AnyTalk"></activity>
+        <activity android:name=".SearchUsers"></activity>
+        <activity android:name=".AnyTalk" />
         <activity android:name=".StoryStatus" />
         <activity android:name=".ChatAllEntities.ChatActivity" />
         <activity android:name=".ChatAllEntities.MessageActivity" />

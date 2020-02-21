@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/toolbar"
     android:layout_width="match_parent"
-    app:navigationIcon="@drawable/search_user"
     android:layout_height="45dp"
     android:background="@color/style_color_primary"
     android:elevation="@dimen/default_elevation"

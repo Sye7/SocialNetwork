@@ -15,7 +15,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.GestureDetectorCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,7 +24,6 @@ import com.example.socialnetwork.adapter.FeedAdapter;
 import com.example.socialnetwork.adapter.StoryAdapter;
 import com.example.socialnetwork.model.Post;
 import com.example.socialnetwork.model.Story;
-import com.example.socialnetwork.swipe_listener.OnSwipeListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -52,7 +50,6 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
     public static String storyId = "";
     boolean backPressToExit = false;
     // Up down gestures
-    GestureDetectorCompat gestureDetector;
 
 
     @Override
@@ -88,13 +85,7 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
 
         //Increase the amount of extra space that should be laid out by LayoutManager.
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this) {
-            @Override
-            protected int getExtraLayoutSpace(RecyclerView.State state) {
-                return 300;
-            }
-
-        };
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         rvFeed.setLayoutManager(linearLayoutManager);
         rvFeed.setItemAnimator(new DefaultItemAnimator());
 
@@ -206,12 +197,97 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
 
     }
 
+    private int min_distance = 100;
+    private float downX, downY, upX, upY;
+    View v;
+
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        gestureDetector.onTouchEvent(event);
-        return true;
+        this.v = v;
+        switch (event.getAction()) { // Check vertical and horizontal touches
+            case MotionEvent.ACTION_DOWN: {
+                downX = event.getX();
+                downY = event.getY();
+                return true;
+            }
+            case MotionEvent.ACTION_UP: {
+                upX = event.getX();
+                upY = event.getY();
+
+                float deltaX = downX - upX;
+                float deltaY = downY - upY;
+
+                //HORIZONTAL SCROLL
+                if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                    if (Math.abs(deltaX) > min_distance) {
+                        // left or right
+                        if (deltaX < 0) {
+                            this.onLeftToRightSwipe();
+                            return true;
+                        }
+                        if (deltaX > 0) {
+                            this.onRightToLeftSwipe();
+                            return true;
+                        }
+                    } else {
+                        //not long enough swipe...
+                        return false;
+                    }
+                }
+                //VERTICAL SCROLL
+                else {
+                    if (Math.abs(deltaY) > min_distance) {
+                        // top or down
+                        if (deltaY < 0) {
+                            this.onTopToBottomSwipe();
+                            return true;
+                        }
+                        if (deltaY > 0) {
+                            this.onBottomToTopSwipe();
+                            return true;
+                        }
+                    } else {
+                        //not long enough swipe...
+                        return false;
+                    }
+                }
+                return false;
+            }
+        }
+        return false;
     }
 
+    public void onLeftToRightSwipe() {
+
+        Intent intent = new Intent(getApplicationContext(), CameraXNew.class);
+        Bundle bndlAnimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.left_to_rigth_for_lr, R.anim.right_to_left_for_lr).toBundle();
+        startActivity(intent, bndlAnimation);
+
+    }
+
+    public void onRightToLeftSwipe() {
+
+        Intent intent = new Intent(getApplicationContext(), UserProfileActivity.class);
+        Bundle bndlAnimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.slide_left_anim, R.anim.slide_right_anim).toBundle();
+        startActivity(intent, bndlAnimation);
+
+    }
+
+
+    public void onTopToBottomSwipe() {
+
+    }
+
+    public void onBottomToTopSwipe() {
+
+    }
+
+    ImageButton ibSearchBtn;
+
+    public void searchAvtivity(View v)
+    {
+        startActivity(new Intent(getApplicationContext(), SearchUsers.class));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -225,6 +301,7 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
         rvFeed.setHasFixedSize(true);
         storyFragment = findViewById(R.id.storyViewModeFragment);
         storyRecyclerView = findViewById(R.id.rvStory);
+        ibSearchBtn = findViewById(R.id.ivSearchButton);
         storyRecyclerView.setHasFixedSize(true);
         storyData = new ArrayList<>();
 
@@ -256,10 +333,11 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
 
 
         // Swipe for story
-        OnSwipeListener onSwipeListenerUpDown = generateSwipeListenerForStory();
-        gestureDetector = new GestureDetectorCompat(this, onSwipeListenerUpDown);
         rvFeed.setOnTouchListener(this);
 
+
+        // swipeaRv.setOnTouchListener(this);
+        // swipeNested.setOnTouchListener(this);
 
 
         new Thread(new Runnable() {
@@ -296,14 +374,6 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
         startIntroAnimation();
 
 
-        rvFeed.setOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                FeedContextMenuManager.getInstance().onScrolled(recyclerView, dx, dy);
-            }
-        });
-
-
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -313,77 +383,6 @@ public class MainActivity extends AppCompatActivity implements FeedAdapter.OnFee
         }).start();
     }
 
-
-    private OnSwipeListener generateSwipeListenerForStory() {
-
-        OnSwipeListener onSwipeListener = new OnSwipeListener() {
-
-            @Override
-            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-
-                // Grab two events located on the plane at e1=(x1, y1) and e2=(x2, y2)
-                // Let e1 be the initial event
-                // e2 can be located at 4 different positions, consider the following diagram
-                // (Assume that lines are separated by 90 degrees.)
-                //
-                //
-                //         \ A  /
-                //          \  /
-                //       D   e1   B
-                //          /  \
-                //         / C  \
-                //
-                // So if (x2,y2) falls in region:
-                //  A => it's an UP swipe
-                //  B => it's a RIGHT swipe
-                //  C => it's a DOWN swipe
-                //  D => it's a LEFT swipe
-                //
-
-                float x1 = e1.getX();
-                float y1 = e1.getY();
-
-                float x2 = e2.getX();
-                float y2 = e2.getY();
-
-                Direction direction = getDirection(x1, y1, x2, y2);
-                return onSwipe(direction);
-            }
-
-
-            @Override
-            public boolean onSwipe(Direction direction) {
-
-                // Possible implementation
-                if (direction == OnSwipeListener.Direction.up) {
-                    return false;
-                }
-              else  if (direction == Direction.down) {
-                    return false;
-                }
-
-              else if (direction == OnSwipeListener.Direction.left) {
-
-                    Intent intent = new Intent(getApplicationContext(), UserProfileActivity.class);
-                    Bundle bndlAnimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.slide_left_anim, R.anim.slide_right_anim).toBundle();
-                    startActivity(intent, bndlAnimation);
-                    return true;
-                } else if (direction == OnSwipeListener.Direction.right) {
-                    Intent intent = new Intent(getApplicationContext(), CameraXNew.class);
-                    Bundle bndlAnimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.left_to_rigth_for_lr, R.anim.right_to_left_for_lr).toBundle();
-                    startActivity(intent, bndlAnimation);
-                    return true;
-
-                }
-
-
-                return super.onSwipe(direction);
-            }
-        };
-
-        return onSwipeListener;
-
-    }
 
     String id;
     String photo;

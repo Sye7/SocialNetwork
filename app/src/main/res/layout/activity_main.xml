@@ -8,26 +8,46 @@
     tools:context=".MainActivity">
 
 
+
     <include
         android:id="@+id/toolbar"
         layout="@layout/view_feed_toolbar" />
 
-    <ScrollView
-        android:id="@+id/vStory"
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:gravity="bottom"
+        android:elevation="@dimen/default_elevation"
+        android:layout_height="45dp">
+
+
+        <ImageButton
+            android:layout_width="30dp"
+            android:id="@+id/ivSearchButton"
+            android:onClick="searchAvtivity"
+            android:layout_marginStart="20dp"
+            android:background="@drawable/search_user"
+            android:layout_height="30dp"/>
+
+    </RelativeLayout>
+
+    <ImageView
+        android:layout_width="?attr/actionBarSize"
+        android:layout_marginStart="20dp"
+        android:src="@drawable/search_user"
+        android:layout_height="?attr/actionBarSize"/>
+
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/rvStory"
-        android:layout_below="@id/toolbar">
+        android:layout_above="@+id/rvStory"
+        android:layout_below="@+id/toolbar">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvFeed"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@+id/rvStory"
-            android:layout_below="@+id/toolbar"
-            android:scrollbars="none" />
+            android:layout_height="match_parent" />
 
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 
     <fragment
