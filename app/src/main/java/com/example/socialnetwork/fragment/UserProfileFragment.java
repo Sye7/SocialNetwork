@@ -1,15 +1,11 @@
-package com.example.socialnetwork;
+package com.example.socialnetwork.fragment;
 
-
-import android.app.Activity;
-import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -25,17 +21,17 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GestureDetectorCompat;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.example.socialnetwork.CircularImage.CircleTransformation;
+import com.example.socialnetwork.R;
 import com.example.socialnetwork.adapter.UserProfileAdapter;
 import com.example.socialnetwork.model.Post;
 import com.example.socialnetwork.model.Profile;
 import com.example.socialnetwork.model.UserLoginModel;
-import com.example.socialnetwork.swipe_listener.OnSwipeListener;
 import com.example.socialnetwork.view.RevealBackgroundView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -56,11 +52,9 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
+public class UserProfileFragment extends Fragment implements RevealBackgroundView.OnStateChangeListener {
 
-// Circular Reveal
 
-public class UserProfileActivity extends AppCompatActivity implements RevealBackgroundView.OnStateChangeListener,
-        View.OnTouchListener {
     public static final String ARG_REVEAL_START_LOCATION = "reveal_start_location";
 
     private static final int USER_OPTIONS_ANIMATION_DELAY = 300;
@@ -96,17 +90,162 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
     private int avatarSize;
     private String profilePhoto;
     private UserProfileAdapter userPhotosAdapter;
+    Context thisCtx;
 
-    public void showStory(View view) {
 
-        startActivity(new Intent(getApplicationContext(), StoryStatus.class));
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.activity_user_profile, container, false);
+
+        this.avatarSize = getResources().getDimensionPixelSize(R.dimen.user_profile_avatar_size);
+        thisCtx = inflater.getContext();
+
+
+        vRevealBackground = (RevealBackgroundView) view.findViewById(R.id.vRevealBackground);
+        rvUserProfile = view.findViewById(R.id.rvUserProfile);
+        ivUserProfilePhoto = view.findViewById(R.id.ivUserProfilePhoto);
+        vUserDetails = view.findViewById(R.id.vUserDetails);
+        btnFollow = view.findViewById(R.id.btnFollow);
+        vUserStats = view.findViewById(R.id.vUserStats);
+        vUserProfileRoot = view.findViewById(R.id.vUserProfileRoot);
+        tvUserName = view.findViewById(R.id.tvUserName);
+        tvInstaUserName = view.findViewById(R.id.tv_insta_UserName);
+        tvOccupation = view.findViewById(R.id.tvOccupation);
+        ctx = thisCtx;
+        photosPost = new ArrayList<>();
+
+        postCount = view.findViewById(R.id.tvPostCount);
+        followersCount = view.findViewById(R.id.tvFollowersCount);
+        followingCount = view.findViewById(R.id.tvFollowingCount);
+
+        rvUserProfile.setVisibility(View.VISIBLE);
+        //  tlUserProfileTabs.setVisibility(View.VISIBLE);
+        vUserProfileRoot.setVisibility(View.VISIBLE);
+
+        btnFollow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setting();
+
+            }
+        });
+
+
+        userPhotosAdapter = new UserProfileAdapter(thisCtx, photosPost);
+        animateUserProfileHeader();
+        scrv = view.findViewById(R.id.scRv);
+
+
+        fillPhotoPostList();
+
+
+        mFirebaseStorage = FirebaseStorage.getInstance();
+        mChatPhotoStorageRef = mFirebaseStorage.getReference().child("image_photos");
+
+
+        setupUserProfileGrid();
+        setupRevealBackground(savedInstanceState);
+        getData();
+
+        return view;
     }
 
 
-    public static void startUserProfileFromLocation(int[] startingLocation, Activity startingActivity) {
-        Intent intent = new Intent(startingActivity, UserProfileActivity.class);
-        intent.putExtra(ARG_REVEAL_START_LOCATION, startingLocation);
-        startingActivity.startActivity(intent);
+    public void startFollowUnfollow() {
+
+        if (currentUserModel.getUserName().equals(tvInstaUserName.getText()))
+        {
+            Toast.makeText(thisCtx, "Not Allowed", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        DatabaseReference otherUserProfile = FirebaseDatabase.getInstance().getReference("Profile");
+
+
+        Query query = otherUserProfile.orderByChild("userName").equalTo(tvInstaUserName.getText().toString());
+
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Profile profile = snapshot.getValue(Profile.class);
+
+
+
+
+                    if (profile.getUserName().equals(tvInstaUserName.getText().toString())) {
+
+                        // If already present
+
+                        DatabaseReference followingRef = FirebaseDatabase.getInstance().getReference("Followers").child(profile.getId());
+
+
+                        followingRef.push().setValue(currentUserModel);
+
+                        DatabaseReference otherUserProfile = FirebaseDatabase.getInstance().getReference("Following").child(currentUserModel.getId());
+                        otherUserProfile.push().setValue(profile);
+                        btnFollow.setText("FOLLOWING");
+
+                    }
+
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+
+    public void fillPhotoPostList() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Post");
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        Query query = reference.orderByChild("id").equalTo(firebaseUser.getUid());
+
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Post post = snapshot.getValue(Post.class);
+
+
+                    if (post.getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+
+                        // If already present
+                        String photoUrl = post.getPhoto();
+                        photosPost.add(photoUrl);
+
+
+                        rvUserProfile.setVisibility(View.VISIBLE);
+                        //  tlUserProfileTabs.setVisibility(View.VISIBLE);
+                        vUserProfileRoot.setVisibility(View.VISIBLE);
+
+                        userPhotosAdapter.notifyDataSetChanged();
+                        postCount.setText(photosPost.size() + "");
+
+                    }
+
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
 
@@ -120,11 +259,11 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 
 
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RC_PHOTO_PICKER && resultCode == RESULT_OK) {
+        if (requestCode == RC_PHOTO_PICKER && resultCode == getActivity().RESULT_OK) {
 
             selectedImageUri = data.getData();
 
@@ -135,10 +274,10 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
 
     Profile updateProfile = new Profile();
 
-    public void setting(View view) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    public void setting() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(thisCtx);
         builder.setTitle("Edit Profile");
-        View viewInflated = LayoutInflater.from(this).inflate(R.layout.edit_profile_dialog, (ViewGroup) findViewById(android.R.id.content), false);
+        View viewInflated = LayoutInflater.from(thisCtx).inflate(R.layout.edit_profile_dialog, (ViewGroup) getView().findViewById(android.R.id.content), false);
         final EditText userName = (EditText) viewInflated.findViewById(R.id.et_username);
         final EditText interest = (EditText) viewInflated.findViewById(R.id.et_interest);
 
@@ -166,7 +305,7 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
-                            Toast.makeText(UserProfileActivity.this, "Image Uploaded Successfully", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(thisCtx, "Image Uploaded Successfully", Toast.LENGTH_SHORT).show();
                             Task<Uri> downloadUri = taskSnapshot.getStorage().getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Uri> task) {
@@ -334,220 +473,12 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
                 .into(ivUserProfilePhoto);
     }
 
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        gestureDetector.onTouchEvent(event);
-        return true;
-    }
 
     GestureDetectorCompat gestureDetector;
 
     Context ctx;
     ScrollView scrv;
     Profile currentUserModel;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_profile);
-
-
-        this.avatarSize = getResources().getDimensionPixelSize(R.dimen.user_profile_avatar_size);
-
-
-        vRevealBackground = (RevealBackgroundView) findViewById(R.id.vRevealBackground);
-        rvUserProfile = findViewById(R.id.rvUserProfile);
-        ivUserProfilePhoto = findViewById(R.id.ivUserProfilePhoto);
-        vUserDetails = findViewById(R.id.vUserDetails);
-        btnFollow = findViewById(R.id.btnFollow);
-        vUserStats = findViewById(R.id.vUserStats);
-        vUserProfileRoot = findViewById(R.id.vUserProfileRoot);
-        tvUserName = findViewById(R.id.tvUserName);
-        tvInstaUserName = findViewById(R.id.tv_insta_UserName);
-        tvOccupation = findViewById(R.id.tvOccupation);
-        ctx = this;
-        photosPost = new ArrayList<>();
-
-        postCount = findViewById(R.id.tvPostCount);
-        followersCount = findViewById(R.id.tvFollowersCount);
-        followingCount = findViewById(R.id.tvFollowingCount);
-
-        rvUserProfile.setVisibility(View.VISIBLE);
-        //  tlUserProfileTabs.setVisibility(View.VISIBLE);
-        vUserProfileRoot.setVisibility(View.VISIBLE);
-
-
-        userPhotosAdapter = new UserProfileAdapter(this, photosPost);
-        animateUserProfileHeader();
-        scrv = findViewById(R.id.scRv);
-
-
-        fillPhotoPostList();
-
-
-        mFirebaseStorage = FirebaseStorage.getInstance();
-        mChatPhotoStorageRef = mFirebaseStorage.getReference().child("image_photos");
-
-        OnSwipeListener onSwipeListenerUpDown = generateSwipeListenerForStory();
-        gestureDetector = new GestureDetectorCompat(this, onSwipeListenerUpDown);
-        scrv.setOnTouchListener(this);
-
-
-        setupUserProfileGrid();
-        setupRevealBackground(savedInstanceState);
-        getData();
-
-    }
-
-    public void startFollowUnfollow(View view) {
-
-
-
-        DatabaseReference otherUserProfile = FirebaseDatabase.getInstance().getReference("Profile");
-
-
-        Query query = otherUserProfile.orderByChild("userName").equalTo(tvInstaUserName.getText().toString());
-
-        query.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Profile profile = snapshot.getValue(Profile.class);
-
-                    if (profile.getUserName().equals(tvInstaUserName.getText().toString())) {
-
-                        // If already present
-                        DatabaseReference followingRef = FirebaseDatabase.getInstance().getReference("Followers").child(profile.getId());
-                        followingRef.push().setValue(currentUserModel);
-
-                        DatabaseReference otherUserProfile = FirebaseDatabase.getInstance().getReference("Following").child(currentUserModel.getId());
-                        otherUserProfile.push().setValue(profile);
-
-                    }
-
-                }
-
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-    }
-
-    @Override
-    public void onBackPressed() {
-
-    }
-
-    public void fillPhotoPostList() {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Post");
-        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        Query query = reference.orderByChild("id").equalTo(firebaseUser.getUid());
-
-        query.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Post post = snapshot.getValue(Post.class);
-
-
-                    if (post.getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
-
-                        // If already present
-                        String photoUrl = post.getPhoto();
-                        photosPost.add(photoUrl);
-
-
-                        rvUserProfile.setVisibility(View.VISIBLE);
-                        //  tlUserProfileTabs.setVisibility(View.VISIBLE);
-                        vUserProfileRoot.setVisibility(View.VISIBLE);
-
-                        userPhotosAdapter.notifyDataSetChanged();
-                        postCount.setText(photosPost.size() + "");
-
-                    }
-
-                }
-
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-    }
-
-
-    private OnSwipeListener generateSwipeListenerForStory() {
-
-        OnSwipeListener onSwipeListener = new OnSwipeListener() {
-
-            @Override
-            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-
-                // Grab two events located on the plane at e1=(x1, y1) and e2=(x2, y2)
-                // Let e1 be the initial event
-                // e2 can be located at 4 different positions, consider the following diagram
-                // (Assume that lines are separated by 90 degrees.)
-                //
-                //
-                //         \ A  /
-                //          \  /
-                //       D   e1   B
-                //          /  \
-                //         / C  \
-                //
-                // So if (x2,y2) falls in region:
-                //  A => it's an UP swipe
-                //  B => it's a RIGHT swipe
-                //  C => it's a DOWN swipe
-                //  D => it's a LEFT swipe
-                //
-
-                float x1 = e1.getX();
-                float y1 = e1.getY();
-
-                float x2 = e2.getX();
-                float y2 = e2.getY();
-
-                Direction direction = getDirection(x1, y1, x2, y2);
-                return onSwipe(direction);
-            }
-
-
-            @Override
-            public boolean onSwipe(Direction direction) {
-
-                // Possible implementation
-
-
-                if (direction == OnSwipeListener.Direction.right) {
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    Bundle bndlAnimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.left_to_rigth_for_lr, R.anim.right_to_left_for_lr).toBundle();
-                    startActivity(intent, bndlAnimation);
-                    finish();
-                    return true;
-                }
-
-
-                return super.onSwipe(direction);
-
-            }
-        };
-
-        return onSwipeListener;
-
-    }
 
 
     private void setupRevealBackground(Bundle savedInstanceState) {
@@ -594,7 +525,7 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
             vUserProfileRoot.setVisibility(View.VISIBLE);
 
 
-            userPhotosAdapter = new UserProfileAdapter(this, photosPost);
+            userPhotosAdapter = new UserProfileAdapter(thisCtx, photosPost);
             rvUserProfile.setAdapter(userPhotosAdapter);
             animateUserProfileHeader();
         } else {
@@ -653,7 +584,6 @@ public class UserProfileActivity extends AppCompatActivity implements RevealBack
 
             }
         });
-
 
 
         Query query = userRef.orderByChild("id").equalTo(firebaseUser.getUid());

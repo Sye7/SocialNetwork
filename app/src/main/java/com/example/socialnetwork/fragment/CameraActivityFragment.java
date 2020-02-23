@@ -1,8 +1,7 @@
-package com.example.socialnetwork;
-
+package com.example.socialnetwork.fragment;
 
 import android.annotation.SuppressLint;
-import android.app.ActivityOptions;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -13,18 +12,16 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Rational;
 import android.util.Size;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraInfoUnavailableException;
 import androidx.camera.core.CameraX;
 import androidx.camera.core.ImageCapture;
@@ -35,14 +32,17 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GestureDetectorCompat;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 
+import com.example.socialnetwork.PublishActivity;
+import com.example.socialnetwork.R;
 import com.example.socialnetwork.swipe_listener.OnSwipeListener;
 
 import java.io.File;
 import java.io.IOException;
 
-public class CameraXNew extends AppCompatActivity implements  View.OnTouchListener {
+public class CameraActivityFragment extends Fragment implements View.OnTouchListener {
 
     private int REQUEST_CODE_PERMISSIONS = 101;
     private String[] REQUIRED_PERMISSIONS = new String[]{"android.permission.CAMERA",
@@ -52,43 +52,39 @@ public class CameraXNew extends AppCompatActivity implements  View.OnTouchListen
     final int RC_PHOTO_PICKER = 1;
     Uri selectedImageUri;
 
-    static Bitmap bitmap;
+    public static Bitmap bitmap;
+    Context thisContext;
+    View fragView;
 
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.activity_camera_xnew, container, false);
+        fragView = view;
+
+        thisContext = inflater.getContext();
+        textureView = view.findViewById(R.id.view_finder);
+        layout = view.findViewById(R.id.cameraBg);
+
+        OnSwipeListener onSwipeListenerUpDown = generateSwipeListenerForStory();
+        gestureDetector = new GestureDetectorCompat(thisContext, onSwipeListenerUpDown);
+        layout.setOnTouchListener(this);
 
 
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RC_PHOTO_PICKER && resultCode == RESULT_OK) {
+        if (allPermissionGranted()) {
 
-            selectedImageUri = data.getData();
+            startCamera();
+        } else {
 
-            try {
-                 bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImageUri);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            Intent inte = new Intent(getApplicationContext(), PublishActivity.class);
-            inte.putExtra("path",  "bitmap");
-            startActivity(inte);
-
-
+            ActivityCompat.requestPermissions(getActivity(), REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
         }
 
 
+        return view;
     }
-
-    public void EditDp(View view)
-    {
-        // TODO: Fire an intent to show an image picker
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("image/jpeg");
-        intent.putExtra(Intent.EXTRA_LOCAL_ONLY,true);
-        startActivityForResult(Intent.createChooser(intent,"Complete Action Using"),RC_PHOTO_PICKER);
-
-    }
-
 
 
     private OnSwipeListener generateSwipeListenerForStory() {
@@ -98,35 +94,15 @@ public class CameraXNew extends AppCompatActivity implements  View.OnTouchListen
             @Override
             public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
 
-                // Grab two events located on the plane at e1=(x1, y1) and e2=(x2, y2)
-                // Let e1 be the initial event
-                // e2 can be located at 4 different positions, consider the following diagram
-                // (Assume that lines are separated by 90 degrees.)
-                //
-                //
-                //         \ A  /
-                //          \  /
-                //       D   e1   B
-                //          /  \
-                //         / C  \
-                //
-                // So if (x2,y2) falls in region:
-                //  A => it's an UP swipe
-                //  B => it's a RIGHT swipe
-                //  C => it's a DOWN swipe
-                //  D => it's a LEFT swipe
-                //
-
                 float x1 = e1.getX();
                 float y1 = e1.getY();
 
                 float x2 = e2.getX();
                 float y2 = e2.getY();
 
-                Direction direction = getDirection(x1,y1,x2,y2);
+                Direction direction = getDirection(x1, y1, x2, y2);
                 return onSwipe(direction);
             }
-
 
 
             @Override
@@ -135,21 +111,10 @@ public class CameraXNew extends AppCompatActivity implements  View.OnTouchListen
                 // Possible implementation
 
 
-                 if(direction == OnSwipeListener.Direction.left ) {
-
-                    Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-                    Bundle bndlAnimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.slide_left_anim, R.anim.slide_right_anim).toBundle();
-                    startActivity(intent, bndlAnimation);
-                    finish();
+                if (direction == OnSwipeListener.Direction.up) {
+                    switchCamera();
                     return true;
                 }
-
-               else if(direction == OnSwipeListener.Direction.up ) {
-                     switchCamera();
-                    return true;
-                }
-
-
 
 
                 return super.onSwipe(direction);
@@ -161,42 +126,11 @@ public class CameraXNew extends AppCompatActivity implements  View.OnTouchListen
     }
 
 
-
-    GestureDetectorCompat  gestureDetector;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-
-        setContentView(R.layout.activity_camera_xnew);
+    GestureDetectorCompat gestureDetector;
 
 
-        textureView = findViewById(R.id.view_finder);
-        layout = findViewById(R.id.cameraBg);
-
-        OnSwipeListener onSwipeListenerUpDown = generateSwipeListenerForStory();
-        gestureDetector = new GestureDetectorCompat(this, onSwipeListenerUpDown);
-        layout.setOnTouchListener(this);
-
-
-
-        if(allPermissionGranted()){
-
-            startCamera();
-        }
-        else{
-
-            ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
-        }
-    }
-
-    public void recordVideo(){
-
-    }
     @SuppressLint("RestrictedApi")
-    public void switchCamera(){
+    public void switchCamera() {
 
         lensFacing = lensFacing == CameraX.LensFacing.FRONT ? CameraX.LensFacing.BACK : CameraX.LensFacing.FRONT;
         try {
@@ -207,6 +141,7 @@ public class CameraXNew extends AppCompatActivity implements  View.OnTouchListen
             // Do nothing
         }
     }
+
     private CameraX.LensFacing lensFacing = CameraX.LensFacing.BACK;
 
 
@@ -236,35 +171,33 @@ public class CameraXNew extends AppCompatActivity implements  View.OnTouchListen
                 });
 
         ImageCaptureConfig imageCaptureConfig = new ImageCaptureConfig.Builder().setCaptureMode(ImageCapture.CaptureMode.MIN_LATENCY).setLensFacing(lensFacing)
-                .setTargetRotation(getWindowManager().getDefaultDisplay().getRotation()).build();
+                .setTargetRotation(getActivity().getWindowManager().getDefaultDisplay().getRotation()).build();
         final ImageCapture imgCap = new ImageCapture(imageCaptureConfig);
 
 
-
-        findViewById(R.id.imgCapture).setOnClickListener(new View.OnClickListener() {
+        fragView.findViewById(R.id.imgCapture).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
 
-
-                File file = new File( Environment.getExternalStorageDirectory().getPath()+"/DCIM",/* "/sdcard/photos/DCIM/Camera/CameraX_",*/ System.currentTimeMillis() + ".jpg"   );
+                File file = new File(Environment.getExternalStorageDirectory().getPath() + "/DCIM",/* "/sdcard/photos/DCIM/Camera/CameraX_",*/ System.currentTimeMillis() + ".jpg");
                 imgCap.takePicture(file, new ImageCapture.OnImageSavedListener() {
                     @Override
                     public void onImageSaved(@NonNull File file) {
                         String path = file.getAbsolutePath();
 
-                        Intent intent = new Intent(getApplicationContext(), PublishActivity.class);
-                        intent.putExtra("path",path);
+                        Intent intent = new Intent(thisContext, PublishActivity.class);
+                        intent.putExtra("path", path);
                         startActivity(intent);
 
-                        Toast.makeText(getBaseContext(), path,Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity().getBaseContext(), path, Toast.LENGTH_LONG).show();
                     }
 
                     @Override
                     public void onError(@NonNull ImageCapture.UseCaseError useCaseError, @NonNull String message, @Nullable Throwable cause) {
                         String msg = "Pic capture failed : " + message;
-                        Toast.makeText(getBaseContext(), msg,Toast.LENGTH_LONG).show();
-                        if(cause != null){
+                        Toast.makeText(getActivity().getBaseContext(), msg, Toast.LENGTH_LONG).show();
+                        if (cause != null) {
                             cause.printStackTrace();
                         }
                     }
@@ -272,12 +205,11 @@ public class CameraXNew extends AppCompatActivity implements  View.OnTouchListen
             }
         });
 
-        CameraX.bindToLifecycle((LifecycleOwner)this, preview, imgCap);
+        CameraX.bindToLifecycle((LifecycleOwner) this, preview, imgCap);
     }
 
 
-
-    private void updateTransform(){
+    private void updateTransform() {
 
         Matrix mx = new Matrix();
         float w = textureView.getMeasuredWidth();
@@ -287,9 +219,9 @@ public class CameraXNew extends AppCompatActivity implements  View.OnTouchListen
         float cY = h / 2f;
 
         int rotationDgr;
-        int rotation = (int)textureView.getRotation();
+        int rotation = (int) textureView.getRotation();
 
-        switch(rotation){
+        switch (rotation) {
             case Surface.ROTATION_0:
                 rotationDgr = 0;
                 break;
@@ -306,28 +238,27 @@ public class CameraXNew extends AppCompatActivity implements  View.OnTouchListen
                 return;
         }
 
-        mx.postRotate((float)rotationDgr, cX, cY);
+        mx.postRotate((float) rotationDgr, cX, cY);
         textureView.setTransform(mx);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
-        if(requestCode == REQUEST_CODE_PERMISSIONS){
-            if(allPermissionGranted()){
+        if (requestCode == REQUEST_CODE_PERMISSIONS) {
+            if (allPermissionGranted()) {
                 startCamera();
-            } else{
-                Toast.makeText(this, "Permissions not granted by the user.", Toast.LENGTH_SHORT).show();
-                finish();
+            } else {
+                Toast.makeText(thisContext, "Please Grant Permission.", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
     private boolean allPermissionGranted() {
 
-        for(String permission : REQUIRED_PERMISSIONS){
+        for (String permission : REQUIRED_PERMISSIONS) {
 
-            if(ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED){
+            if (ContextCompat.checkSelfPermission(thisContext, permission) != PackageManager.PERMISSION_GRANTED) {
 
                 return false;
             }
@@ -340,4 +271,38 @@ public class CameraXNew extends AppCompatActivity implements  View.OnTouchListen
         gestureDetector.onTouchEvent(event);
         return true;
     }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+
+
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RC_PHOTO_PICKER && resultCode == getActivity().RESULT_OK) {
+
+            selectedImageUri = data.getData();
+
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(thisContext.getContentResolver(), selectedImageUri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Intent inte = new Intent(thisContext, PublishActivity.class);
+            inte.putExtra("path", "bitmap");
+            startActivity(inte);
+
+
+        }
+    }
+
+    public void EditDp(View view) {
+        // TODO: Fire an intent to show an image picker
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/jpeg");
+        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+        startActivityForResult(Intent.createChooser(intent, "Complete Action Using"), RC_PHOTO_PICKER);
+
+    }
+
+
 }

@@ -17,6 +17,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.socialnetwork.fragment.CameraActivityFragment;
 import com.example.socialnetwork.model.Post;
 import com.example.socialnetwork.model.Profile;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -132,7 +133,7 @@ public class PublishActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
 
-                                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                                startActivity(new Intent(getApplicationContext(), MainTabActivity.class));
                                 finish();
                             }
                         });
@@ -241,7 +242,7 @@ public class PublishActivity extends AppCompatActivity {
 
        // pictureBitmap = Bitmap.createBitmap(BitmapFactory.decodeByteArray(CameraXImpl.pic,0,CameraXImpl.pic.length));
        if(path.equals("bitmap"))
-            pictureBitmap = CameraXNew.bitmap;
+            pictureBitmap = CameraActivityFragment.bitmap;
         else
             pictureBitmap = BitmapFactory.decodeFile(path);
 

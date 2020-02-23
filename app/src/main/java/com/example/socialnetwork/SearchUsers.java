@@ -1,11 +1,13 @@
 package com.example.socialnetwork;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -103,17 +105,31 @@ public class SearchUsers extends AppCompatActivity {
 
         }
 
-        public void setDetails(Context ctx, String userName, String userStatus, String userImage){
+        public void setDetails(final Context ctx, final String userName, String userStatus, final String userImage){
 
-            TextView user_name = (TextView) mView.findViewById(R.id.name_text);
+            final TextView user_name = (TextView) mView.findViewById(R.id.name_text);
             TextView user_status = (TextView) mView.findViewById(R.id.status_text);
             ImageView user_image = (ImageView) mView.findViewById(R.id.profile_image);
+            RelativeLayout rlSearch = mView.findViewById(R.id.rlSearch);
+
 
 
             user_name.setText(userName);
             user_status.setText(userStatus);
 
             Glide.with(ctx).load(userImage).into(user_image);
+
+            rlSearch.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    Intent intent = new Intent(ctx, OtherUserProfile.class);
+                    intent.putExtra("userName",userName);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    ctx.startActivity(intent);
+                }
+            });
+
 
 
         }

@@ -15,12 +15,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SearchUsers"></activity>
+        <activity android:name=".OtherUserProfile"></activity>
+        <activity android:name=".MainTabActivity" />
+        <activity android:name=".SearchUsers" />
         <activity android:name=".AnyTalk" />
         <activity android:name=".StoryStatus" />
         <activity android:name=".ChatAllEntities.ChatActivity" />
         <activity android:name=".ChatAllEntities.MessageActivity" />
-        <activity android:name=".CameraXNew" />
         <activity android:name=".activity.SignUpActivity" />
         <activity android:name=".activity.StartActivity">
             <intent-filter>
@@ -32,14 +33,9 @@
         <activity android:name=".PublishActivity" />
         <activity android:name=".CameraXImpl" />
         <activity
-            android:name=".UserProfileActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.TransparentActivity" />
-        <activity
             android:name=".CommentsActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.TransparentActivity" />
-        <activity android:name=".MainActivity" />
 
         <meta-data
             android:name="preloaded_fonts"

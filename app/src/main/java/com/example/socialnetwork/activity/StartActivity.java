@@ -15,7 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import com.example.socialnetwork.MainActivity;
+import com.example.socialnetwork.MainTabActivity;
 import com.example.socialnetwork.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -56,7 +56,7 @@ public class StartActivity extends AppCompatActivity {
 
         if (mAuth.getCurrentUser() != null)
         {
-            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            startActivity(new Intent(getApplicationContext(), MainTabActivity.class));
         }
 
         signin.setOnClickListener(new View.OnClickListener() {
@@ -89,7 +89,7 @@ public class StartActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 //start the profile activity
                                 finish();
-                                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                                startActivity(new Intent(getApplicationContext(), MainTabActivity.class));
                             } else {
                                 Toast.makeText(StartActivity.this, "Credentials does not match" , Toast.LENGTH_SHORT).show();
                             }
