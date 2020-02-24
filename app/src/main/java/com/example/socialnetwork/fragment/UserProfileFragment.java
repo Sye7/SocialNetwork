@@ -14,6 +14,7 @@ import android.view.animation.Interpolator;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.example.socialnetwork.CircularImage.CircleTransformation;
+import com.example.socialnetwork.FollowerAndFollowingActivity;
 import com.example.socialnetwork.R;
 import com.example.socialnetwork.adapter.UserProfileAdapter;
 import com.example.socialnetwork.model.Post;
@@ -92,6 +94,9 @@ public class UserProfileFragment extends Fragment implements RevealBackgroundVie
     private UserProfileAdapter userPhotosAdapter;
     Context thisCtx;
 
+    LinearLayout following;
+    LinearLayout follower;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -115,6 +120,9 @@ public class UserProfileFragment extends Fragment implements RevealBackgroundVie
         tvOccupation = view.findViewById(R.id.tvOccupation);
         ctx = thisCtx;
         photosPost = new ArrayList<>();
+
+        follower = view.findViewById(R.id.followerLayout);
+        following = view.findViewById(R.id.followingLayout);
 
         postCount = view.findViewById(R.id.tvPostCount);
         followersCount = view.findViewById(R.id.tvFollowersCount);
@@ -149,14 +157,34 @@ public class UserProfileFragment extends Fragment implements RevealBackgroundVie
         setupRevealBackground(savedInstanceState);
         getData();
 
+        follower.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(getContext(), FollowerAndFollowingActivity.class);
+                intent.putExtra("followOrFollowing", "follower");
+                startActivity(intent);
+
+            }
+        });
+
+        following.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(getContext(), FollowerAndFollowingActivity.class);
+                intent.putExtra("followOrFollowing", "following");
+                startActivity(intent);
+            }
+        });
+
         return view;
     }
 
 
     public void startFollowUnfollow() {
 
-        if (currentUserModel.getUserName().equals(tvInstaUserName.getText()))
-        {
+        if (currentUserModel.getUserName().equals(tvInstaUserName.getText())) {
             Toast.makeText(thisCtx, "Not Allowed", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -172,8 +200,6 @@ public class UserProfileFragment extends Fragment implements RevealBackgroundVie
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Profile profile = snapshot.getValue(Profile.class);
-
-
 
 
                     if (profile.getUserName().equals(tvInstaUserName.getText().toString())) {

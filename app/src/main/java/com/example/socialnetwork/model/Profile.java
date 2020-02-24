@@ -32,6 +32,14 @@ public class Profile {
         this.dp = dp;
     }
 
+    public Profile( String dp, String id, String occupation, int posts, String userName  ) {
+        this.id = id;
+        this.userName = userName;
+        this.occupation = occupation;
+        this.posts = posts;
+        this.dp = dp;
+    }
+
     public String getId() {
         return id;
     }

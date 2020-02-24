@@ -378,6 +378,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private OnFeedItemClickListener onFeedItemClickListener;
 
     public void setOnFeedItemClickListener(OnFeedItemClickListener onFeedItemClickListener) {
+
         this.onFeedItemClickListener = onFeedItemClickListener;
     }
 

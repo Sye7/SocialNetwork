@@ -15,7 +15,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".OtherUserProfile"></activity>
+        <activity android:name=".FollowerAndFollowingActivity"></activity>
+        <activity android:name=".OtherUserProfile" />
         <activity android:name=".MainTabActivity" />
         <activity android:name=".SearchUsers" />
         <activity android:name=".AnyTalk" />
